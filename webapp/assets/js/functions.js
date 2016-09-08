@@ -42,6 +42,8 @@ $(document).ready(function () {
             '<a href="#"><i class="icon-picture"></i><span data-translate="მომხმარებლები">მომხმარებლები</span></a></li>');
         navigation.append('<li id="loadElementsButton" class="k">' +
             '<a href="#"><i class="icon-note"></i><span data-translate="მასალის ტიპები">მასალის ტიპები</span></a></li>');
+        navigation.append('<li id="loadStageTypesButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i><span data-translate="ეტაპის ტიპები">ეტაპის ტიპები</span></a></li>');
         /*navigation.append('<li id="loadAcceptedRequestsButton" class="k">' +
             '<a href="#"><i class="icon-layers"></i><span data-translate="დადასტურებული მოთხოვნები">დადასტურებული მოთხოვნები</span></a></li>');
         navigation.append('<li id="loadTendersButton" class="k">' +
@@ -115,6 +117,13 @@ $(document).ready(function () {
             loadElementTypes();
 
         });
+        $("#loadStageTypesButton").click(function () {
+            $(".k").attr("class", "k");
+            $(this).attr("class", "k nav-active active");
+            loadProjectStageTypes();
+
+        });
+        
         $("#loadAcceptedRequestsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");

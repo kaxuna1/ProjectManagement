@@ -12,12 +12,14 @@ import main.models.Project.ProjectStage;
 import main.models.Project.ProjectStageAction;
 import main.models.Project.ProjectStageActionExpense;
 import main.models.UserManagement.Session;
+import main.models.chartDataModels.ColumnChartKeyValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -115,4 +117,44 @@ public class ProjectStageActionExpansesController {
 
         return projectStageActionExpenseRepository.findByProjectAndActiveOrderByCreateDateDesc(project,true);
     }
+    @RequestMapping("/projectexpansescolumnchart/{id}")
+    @ResponseBody
+    HashMap<Long,ColumnChartKeyValue> getProjectExpansesPieChartData(@CookieValue("projectSessionId") long sessionId,
+                                                                     @PathVariable("id") long id){
+        HashMap<Long,ColumnChartKeyValue> hashMap=new HashMap<>();
+        List<ProjectStageActionExpense> list=getProjectExpenses(sessionId,id);
+        for(ProjectStageActionExpense expense:list){
+            if(!hashMap.containsKey(expense.getElement().getId())){
+                ColumnChartKeyValue value=new ColumnChartKeyValue(expense.getElement().getName(),(expense.getPrice()*expense.getQuantity()));
+                hashMap.put(expense.getElement().getId(),value);
+            }else{
+                ColumnChartKeyValue value=hashMap.get(expense.getElement().getId());
+                value.setSum(value.getSum()+(expense.getQuantity()*expense.getPrice()));
+                hashMap.put(expense.getElement().getId(),value);
+            }
+        }
+
+        return hashMap;
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

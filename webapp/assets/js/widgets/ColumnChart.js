@@ -1,27 +1,20 @@
 /**
  * Created by kaxa on 9/7/16.
  */
-function drawColumnChart(div,data){
+function drawColumnChart(div,data1,data2){
 
-
-    var names=[];
-    var values=[];
-    for(key in data){
-        var current=data[key]
-        names.push(current.elementName);
-        values.push(parseFloat(current.price)*parseFloat(current.quantity))
-    }
+    
 
 
 
-    new Chart(div, {
+    return new Chart(div, {
         type: 'bar',
         data: {
-            labels: names,
+            labels: data1,
             datasets: [{
                 height:300,
                 label: '# ჯამური ღირებულება',
-                data: values,
+                data: data2,
                /* backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -42,6 +35,8 @@ function drawColumnChart(div,data){
             }]
         },
         options: {
+            maintainAspectRatio:false,
+            height:400,
             scales: {
                 yAxes: [{
                     ticks: {

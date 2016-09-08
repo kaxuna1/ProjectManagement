@@ -252,4 +252,16 @@ public class ProjectStageActionController {
                     "არ გაქვთ ამ მოქმედების შესრულების უფლება");
         }
     }
+    @RequestMapping("/projectactiveactions/{id}")
+    @ResponseBody
+    public List<ProjectStageAction> getProjectActiveActions(@CookieValue("projectSessionId") long sessionId,
+                                                            @PathVariable("id") long id){
+        return projectStageActionRepository.findActiveForMainPageByProject(id);
+    }
+    @RequestMapping("/projectswithactionforhierarchytree/{id}")
+    @ResponseBody
+    public List<ProjectStageAction> projectsWithActions(@CookieValue("projectSessionId") long sessionId,
+                                                        @PathVariable("id") long id){
+        return projectStageActionRepository.findActiveForHierarchy(id);
+    }
 }

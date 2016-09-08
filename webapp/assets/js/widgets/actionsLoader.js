@@ -81,16 +81,16 @@ function loadActionsInGrid(data, DOMElements, type) {
             DOMElements.buttonsPanelAction.html("");
             DOMElements.bodyPanelAction.html("");
             DOMElements.bodyPanelAction.html(actionItemsListTemplate);
-            createButtonWithHandlerr(DOMElements.buttonsPanelAction,"უკან დაბრუნება",function () {
+            createButtonWithHandlerr(DOMElements.buttonsPanelAction, "უკან დაბრუნება", function () {
                 DOMElements.bodyPanelActions.show("slow");
                 DOMElements.buttonsPanelActions.show("slow");
                 DOMElements.bodyPanelAction.hide("slow");
                 DOMElements.buttonsPanelAction.hide("slow");
             });
-            if(currentItem.status===1){
-                createButtonWithHandlerr(DOMElements.buttonsPanelAction,"პრარაბთან გაგზავნა",function () {
-                    $.getJSON("/sendactiontoprarab/"+currentItem.id,function (result) {
-                        if(result.code==0){
+            if (currentItem.status === 1) {
+                createButtonWithHandlerr(DOMElements.buttonsPanelAction, "პრარაბთან გაგზავნა", function () {
+                    $.getJSON("/sendactiontoprarab/" + currentItem.id, function (result) {
+                        if (result.code == 0) {
 
                             DOMElements.bodyPanelStages.show("slow");
                             DOMElements.buttonsPanelStages.show("slow");
@@ -99,7 +99,7 @@ function loadActionsInGrid(data, DOMElements, type) {
                             $.getJSON("/getprojectstages/" + currentProjectID, function (result2) {
                                 loadStages(DOMElements, result2);
                             });
-                        }else{
+                        } else {
                             alert("მოხდა შეცდომა");
                         }
 
@@ -107,8 +107,85 @@ function loadActionsInGrid(data, DOMElements, type) {
 
 
                 });
+                createButtonWithHandlerr(DOMElements.buttonsPanelAction, "დამოკიდებული მოქმედების დამატება", function () {
+                    showModalWithTableInside(function (header, body, modal) {
+                        header.html("მოქმედების იერარქიაში დამატება.");
+                        body.append("<div id='actionHierarchyCreate'></div>");
+                        var divBody = $("#actionHierarchyCreate");
+                        divBody.append('<div class="panel-group panel-accordion dark-accordion" id="actionsChooseAcordion"></div>')
+                        var actionsChooseAcordion=$("#actionsChooseAcordion");
+                        var treeData = {
+                            'core': {
+                                'data': []
+                            }
+                        };
+                        var elements={};
+                        $.getJSON("/projectswithactionforhierarchytree/"+currentProjectID,function (result) {
+                            for(key in result){
+                                if(!elements[result[key].stageName]){
+                                    elements[result[key].stageName]=[];
+                                }
+                                elements[result[key].stageName].push(result[key]);
+
+                            }
+                            console.log(elements);
+                            var first=true;
+                            for(key in elements){
+                                var inClass='';
+                                var aria='false';
+                                var classCollapsed='collapsed';
+                                if(first){
+                                    inClass='in';
+                                    aria='true';
+                                    classCollapsed='';
+
+                                }
+                                first=false;
+                                var random=Math.floor((Math.random() * 10000) + 1);
+                                var currentArray=elements[key];
+                                actionsChooseAcordion.append('<div class="panel panel-default">'+
+                                    '<div class="panel-heading">'+
+                                    '<h4>'+
+                                    '<a class="'+classCollapsed+'" data-toggle="collapse" data-parent="#actionsChooseAcordion" href="#collapseOne'+random+
+                                    '" aria-expanded="'+aria+'">'+key+'</a>'+
+                                    '</h4>'+
+                                    '</div>'+
+                                    '<div id="collapseOne'+random+'" class="panel-collapse collapse '+inClass+'" aria-expanded="true">'+
+                                '<div class="panel-body" id="stageKeyActions'+random+'">'+
+                                '</div>'+
+                                '   </div>'+
+                                    '   </div>')
+                                for(key2 in currentArray){
+                                    var currentName=currentArray[key2].name;
+                                    $('#stageKeyActions'+random).append("<button value='"+currentArray[key2].id+"' class='btnActionChoise btn btn-block btn-rounded btn-danger'>"+currentName+"</button><br>");
+                                }
+
+                            }
+                            $(".btnActionChoise").click(function () {
+                                var id=$(this).attr("value");
+                                $.getJSON("/maponeactiontoanother?id1="+currentItem["id"]+"&id2="+id,function (result) {
+                                    if(result){
+                                        modal.modal("hide");
+                                    }
+                                })
+                            })
+
+
+
+                        });
+
+
+
+                        //
+
+                    }, {
+                        "დამატებითი ღილაკი": function () {
+
+                        }
+                    });
+                });
             }
-            loadExpanses(currentItem,DOMElements);
+            loadExpanses(currentItem, DOMElements);
             //loadActions(currentItem,DOMElements)
         })
     })

@@ -1,7 +1,7 @@
 /**
  * Created by kakha on 11/12/2015.
  */
-var currentProjectID=0;
+var currentProjectID = 0;
 function loadProjectsData(index, search) {
     $.getJSON("getprojects?index=" + index + "&search=" + search, function (result) {
             $("#dataGridHeader").html("");
@@ -85,6 +85,11 @@ function loadProjectsData(index, search) {
                     var buttonsPanelActions = $("#buttonsPanelActions");
                     var buttonsPanelAction = $("#buttonsPanelAction");
                     var bodyPanelAction = $("#bodyPanelAction");
+                    var projectName = $("#projectName");
+                    var currentActiveActions = $("#currentActiveActions");
+                    var projectCharts = $("#projectCharts");
+                    var projectOtherInfo = $("#projectOtherInfo");
+                    var projectInfoColumn2Header = $("#projectInfoColumn2Header");
 
                     var DOMElements = {
                         buttonsPanelStages: buttonsPanelStages,
@@ -92,7 +97,12 @@ function loadProjectsData(index, search) {
                         bodyPanelActions: bodyPanelActions,
                         buttonsPanelActions: buttonsPanelActions,
                         bodyPanelAction: bodyPanelAction,
-                        buttonsPanelAction: buttonsPanelAction
+                        buttonsPanelAction: buttonsPanelAction,
+                        projectName:projectName,
+                        currentActiveActions:currentActiveActions,
+                        projectCharts:projectCharts,
+                        projectOtherInfo:projectOtherInfo
+
                     }
 
 
@@ -106,10 +116,17 @@ function loadProjectsData(index, search) {
                     buttonsPanelStages.html("");
                     bodyPanelStages.html("");
 
-                    currentProjectID=currentElement["id"];
+                    currentProjectID = currentElement["id"];
                     $.getJSON("/getprojectstages/" + currentElement["id"], function (result2) {
                         loadStages(DOMElements, result2);
                     });
+
+                    drawCurrentProjectElementExpansesColumnChart(DOMElements);
+                    listCurrentProjectActiveActions(DOMElements);
+
+                    projectName.html("<strong>" + currentElement["name"]+ "</strong>")
+
+
                     if (canCreateProject) {
                         createButtonWithHandlerr(buttonsPanelStages, "ეტაპის დამატება", function () {
                             showModalWithTableInside(function (header, body, modal) {
@@ -320,4 +337,45 @@ function loadProjectsData(index, search) {
             }
         }
     )
+}
+function drawCurrentProjectElementExpansesColumnChart(DOMElements) {
+    $.getJSON("/projectexpansescolumnchart/"+currentProjectID,function (result) {
+        DOMElements.projectCharts.html('<canvas id="projectColumnChart" width="200" height="400"></canvas>');
+        var names=[];
+        var values=[];
+        for(key in result){
+            var current=result[key];
+            names.push(current.name);
+            values.push(current.sum);
+        }
+        var ctx = document.getElementById("projectColumnChart");
+        var columnChart=drawColumnChart(ctx,names,values);
+        console.log(columnChart);
+
+    });
+    
+}
+function listCurrentProjectActiveActions(DOMElements){
+    DOMElements.currentActiveActions.html("kaxa")
+    $.getJSON("/projectactiveactions/"+currentProjectID,function (result) {
+        DOMElements.currentActiveActions.html(projectActiveActionsTemplate);
+        var lastActionsContainerDiv=$("#lastActionsContainerDiv");
+        var lastActionsTableAction1=$("#lastActionsTableAction1");
+        var lastActionsTableAction2=$("#lastActionsTableAction2");
+        var lastActionsTableAction3=$("#lastActionsTableAction3");
+        for(key in result){
+            var element = result[key];
+            var statusString='<span class="label label-danger">'+element.actionStatus+'</span> ';
+            var actionString='<span class="label label-blue">'+element.stageName+'</span>';
+            var dateString='<span class="label label-success">'+moment(element.lastModifyDate).locale("ka").format("L")+'</span>';;
+            lastActionsContainerDiv.append('<div value="'+key+'" class="stage-item message-item media">' +
+                '<div class="media">' +
+                '   <div class="media-body">' +
+                '   <div style="width:25%;margin-left: 20px;" class="sender">' + element.name + '</div>' +
+                '<div style="width: 70%;" class="subject">'+statusString+actionString+dateString+'</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>');
+        }
+    })
 }

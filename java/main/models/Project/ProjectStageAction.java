@@ -210,4 +210,8 @@ public class ProjectStageAction {
     public void setLastModifyDate(Date lastModifyDate) {
         this.lastModifyDate = lastModifyDate;
     }
+
+    public String getStageName(){
+        return projectStage.getName();
+    }
 }

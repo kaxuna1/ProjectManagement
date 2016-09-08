@@ -11,7 +11,20 @@ function loadExpanses(element, DOMElements) {
    
     
     $.getJSON("/getexpenses/" + element["id"], function (result) {
-        var myChart =drawColumnChart(ctx,result);
+        var names=[];
+        var values=[];
+        for(key in result){
+            var current=result[key]
+            names.push(current.elementName);
+            values.push(parseFloat(current.price)*parseFloat(current.quantity))
+        }
+
+
+
+
+
+
+        var myChart =drawColumnChart(ctx,names,values);
         console.log(result)
         for (key in result) {
             $("#expansesUl").append('<li class="high">  ' +
@@ -65,7 +78,9 @@ function loadExpanses(element, DOMElements) {
                         }
                     }, function () {
                         modal.modal("hide");
-                        loadExpanses(element, DOMElements)
+                        loadExpanses(element, DOMElements);
+                        drawCurrentProjectElementExpansesColumnChart(DOMElements);
+                        listCurrentProjectActiveActions(DOMElements);
                     })
 
 
