@@ -34,6 +34,9 @@ public class Loan {
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<LoanMovement> movements;
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<LoanPayment> payments;
 
     @Column
     private String number;
@@ -72,6 +75,7 @@ public class Loan {
         this.lastModifyDate=new Date();
         this.user=user;
         this.movements=new ArrayList<>();
+        this.payments=new ArrayList<>();
     }
     public Loan(){}
 
@@ -162,5 +166,13 @@ public class Loan {
 
     public void setMovements(List<LoanMovement> movements) {
         this.movements = movements;
+    }
+
+    public List<LoanPayment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<LoanPayment> payments) {
+        this.payments = payments;
     }
 }

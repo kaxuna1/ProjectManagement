@@ -1,11 +1,14 @@
 package main.Repositorys.Lombard;
 
+import main.models.DictionaryModels.Filial;
 import main.models.Lombard.Client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Created by kaxa on 11/16/16.
@@ -17,5 +20,7 @@ public interface ClientsRepo extends JpaRepository<Client,Long> {
                                                                    @Param("surname")String surname,
                                                                    @Param("personalNumber")String personalNumber,
                                                                    Pageable pageable);
+
+    List<Client> findByPersonalNumberAndFilial(@Param("personalNumber")String personalNumber, @Param("filial")Filial filial);
 }
 

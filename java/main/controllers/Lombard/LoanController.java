@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
 import main.models.Enum.JsonReturnCodes;
+import main.models.Enum.UserType;
 import main.models.JsonMessage;
 import main.models.LoanCreateModel;
 import main.models.Lombard.Client;
@@ -15,6 +16,7 @@ import main.models.Lombard.Dictionary.MobileBrand;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.Loan;
 import main.models.Lombard.MovementModels.LoanMovement;
+import main.models.Lombard.TypeEnums.MovementTypes;
 import main.models.RequestJsonModel;
 import main.models.UserManagement.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,47 +71,58 @@ public class LoanController {
 
         Session session = sessionRepository.findOne(sessionId);
 
+        if(session.isIsactive()&session.getUser().getType()== UserType.lombardOperator.getCODE()){
 
-        List<MobilePhone> mobilePhones=new ArrayList<>();
-        float loanSum=0;
+            try{
+                List<MobilePhone> mobilePhones=new ArrayList<>();
+                float loanSum=0;
 
 
-        JsonParser jsonParser = new JsonParser();
-        Gson gson = new Gson();
-        JsonObject mainObject=jsonParser.parse(jsonString).getAsJsonObject();
-        JsonObject clientObject=mainObject.getAsJsonObject("client");
-        JsonArray mobiles=mainObject.getAsJsonArray("mobiles");
+                JsonParser jsonParser = new JsonParser();
+                Gson gson = new Gson();
+                JsonObject mainObject=jsonParser.parse(jsonString).getAsJsonObject();
+                JsonObject clientObject=mainObject.getAsJsonObject("client");
+                JsonArray mobiles=mainObject.getAsJsonArray("mobiles");
 
-        long clientId=clientObject.get("id").getAsLong();
-        for (int i = 0; i < mobiles.size(); i++) {
-            JsonObject mobile = mobiles.get(i).getAsJsonObject();
-            MobilePhone mobilePhoneTemp=new MobilePhone();
-            mobilePhoneTemp.setSum(mobile.get("sum").getAsFloat());
-            mobilePhoneTemp.setActive(true);
-            mobilePhoneTemp.setComment(mobile.get("comment").getAsString());
-            mobilePhoneTemp.setIMEI(mobile.get("imei").getAsString());
-            mobilePhoneTemp.setLoan(null);
-            mobilePhoneTemp.setModelName(mobile.get("model").getAsString());
-            mobilePhoneTemp.setMobileBrand(mobileBrandRepo.findOne(mobile.get("brand").getAsLong()));
-            mobilePhoneTemp.setNumber("1234321");
-            mobilePhones.add(mobilePhoneTemp);
-            loanSum+=mobile.get("sum").getAsFloat();
-        }
-        Loan loan = new Loan(clientsRepo.findOne(clientId),
-                session.getUser().getFilial(),loanSum,session.getUser());
-        loan.setNumber("234432");
-        loanRepo.save(loan);
-        mobilePhones.forEach(new Consumer<MobilePhone>() {
-            @Override
-            public void accept(MobilePhone mobilePhone) {
-                mobilePhone.setLoan(loan);
+                long clientId=clientObject.get("id").getAsLong();
+                for (int i = 0; i < mobiles.size(); i++) {
+                    JsonObject mobile = mobiles.get(i).getAsJsonObject();
+                    MobilePhone mobilePhoneTemp=new MobilePhone();
+                    mobilePhoneTemp.setSum(mobile.get("sum").getAsFloat());
+                    mobilePhoneTemp.setActive(true);
+                    mobilePhoneTemp.setComment(mobile.get("comment").getAsString());
+                    mobilePhoneTemp.setIMEI(mobile.get("imei").getAsString());
+                    mobilePhoneTemp.setLoan(null);
+                    mobilePhoneTemp.setModelName(mobile.get("model").getAsString());
+                    mobilePhoneTemp.setMobileBrand(mobileBrandRepo.findOne(mobile.get("brand").getAsLong()));
+                    mobilePhoneTemp.setNumber("1234321");
+                    mobilePhones.add(mobilePhoneTemp);
+                    loanSum+=mobile.get("sum").getAsFloat();
+                }
+                Loan loan = new Loan(clientsRepo.findOne(clientId),
+                        session.getUser().getFilial(),loanSum,session.getUser());
+                loan.setNumber("234432");
+                loanRepo.save(loan);
+                mobilePhones.forEach(new Consumer<MobilePhone>() {
+                    @Override
+                    public void accept(MobilePhone mobilePhone) {
+                        mobilePhone.setLoan(loan);
+                    }
+                });
+                mobilePhoneRepo.save(mobilePhones);
+                LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(),loan);
+                loanMovementsRepo.save(loanMovement);
+
+                return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
+            }catch (Exception e){
+                return  new JsonMessage(JsonReturnCodes.ERROR.getCODE(),"პრობლემა მოხდა სესხის რეგისტრაციის დროს");
             }
-        });
-        mobilePhoneRepo.save(mobilePhones);
+
+        }else {
+            return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),"permission problem");
+        }
 
 
-
-        return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
     }
 
     @RequestMapping("/getloansmovements/{id}")

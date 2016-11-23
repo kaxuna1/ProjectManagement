@@ -1,0 +1,22 @@
+package main.models.Lombard.TypeEnums;
+
+/**
+ * Created by kaxa on 11/23/16.
+ */
+public enum MovementTypes {
+    REGISTERED(1),
+    LOAN_PAYMENT_MADE_PARTIAL(2),
+    LOAN_PAYMENT_MADE_FULL(3),
+    LOAN_PAYMENT_MADE_PERCENT(4);
+
+    private int CODE;
+
+    MovementTypes(int i) {
+        this.CODE=i;
+    }
+
+    public int getCODE() {
+        return CODE;
+    }
+
+}

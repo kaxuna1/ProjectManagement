@@ -7,7 +7,6 @@ import main.models.Enum.JsonReturnCodes;
 import main.models.Enum.UserType;
 import main.models.JsonMessage;
 import main.models.Lombard.Client;
-import main.models.Project.Project;
 import main.models.UserManagement.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by kaxa on 11/17/16.
@@ -33,6 +34,11 @@ public class ClientController {
         if(session.isIsactive()&&
                 (session.getUser().getType()== UserType.lombardOperator.getCODE()
                         ||session.getUser().getType()== UserType.lombardManager.getCODE())){
+            List<Client> clientList=clientsRepo.findByPersonalNumberAndFilial(pn,session.getUser().getFilial());
+            if(clientList.size()>0){
+                return new JsonMessage(JsonReturnCodes.USEREXISTS.getCODE(),"კლიენტი ასეთი პირადი ნომრით უკვე არსებობს");
+            }
+
             try {
                 if(StaticFunctions.checkValueNotEmpty(name,surname,pn,mobile)){
                     Client client=new Client(name,surname,pn,mobile,session.getUser().getFilial());

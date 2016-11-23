@@ -2,7 +2,7 @@
  * Created by kaxa on 11/19/16.
  */
 
-var openLoanGlobal=null;
+var openLoanGlobal = null;
 var currentLoanID = 0;
 var currentLoanObj = null;
 function loadLoansData(index, search) {
@@ -279,27 +279,27 @@ function loadLoansData(index, search) {
                     })
                 })
             });
-        DOMElements.clientProfileOpenButton=createButtonWithHandlerr(DOMElements.clientInfoButtonsPlace,
-            "პროფილის გახსნა", function (){
+        DOMElements.clientProfileOpenButton = createButtonWithHandlerr(DOMElements.clientInfoButtonsPlace,
+            "პროფილის გახსნა", function () {
                 openUserGlobal(DOMElements.currentObj.client);
             });
         DOMElements.clientInfoDataPlace.append("<div>კლიენტი: " + DOMElements.currentObj.client.name + " " +
             DOMElements.currentObj.client.surname + "</div>");
-        DOMElements.clientInfoDataPlace.append("<div>პ/ნ: "+DOMElements.currentObj.client.personalNumber+"</div>");
-        DOMElements.clientInfoDataPlace.append("<div>ტელეფონი: "+DOMElements.currentObj.client.mobile+"</div>");
+        DOMElements.clientInfoDataPlace.append("<div>პ/ნ: " + DOMElements.currentObj.client.personalNumber + "</div>");
+        DOMElements.clientInfoDataPlace.append("<div>ტელეფონი: " + DOMElements.currentObj.client.mobile + "</div>");
     }
 
     function loadLoanInfoData(DOMElements) {
         DOMElements.loanInfoDiv.html("");
-        DOMElements.loanInfoDiv.append("<div>სესხის გამცემი: "+DOMElements.currentObj.user.nameSurname+"</div>");
-        DOMElements.loanInfoDiv.append("<div>პ/ნ: "+DOMElements.currentObj.user.personalNumber+"</div>");
+        DOMElements.loanInfoDiv.append("<div>სესხის გამცემი: " + DOMElements.currentObj.user.nameSurname + "</div>");
+        DOMElements.loanInfoDiv.append("<div>პ/ნ: " + DOMElements.currentObj.user.personalNumber + "</div>");
 
-        DOMElements.loanInfoDiv.append("<div>გაცემის დრო: "+moment(new Date(DOMElements.currentObj.createDate)).locale("ka").format("LLLL") +"</div>");
+        DOMElements.loanInfoDiv.append("<div>გაცემის დრო: " + moment(new Date(DOMElements.currentObj.createDate)).locale("ka").format("LLLL") + "</div>");
     }
 
     function loadUzrunvelyofaDataForLoan(DOMElements) {
-        $.getJSON("/getLoanPhones?loan="+DOMElements.currentObj.id,function (result) {
-            DOMElements.currentObj.uzrunvelyofa=result;
+        $.getJSON("/getLoanPhones?loan=" + DOMElements.currentObj.id, function (result) {
+            DOMElements.currentObj.uzrunvelyofa = result;
             drawUzrunvelyofaGridForLoanInfo(DOMElements);
         })
     }
@@ -324,16 +324,16 @@ function loadLoansData(index, search) {
             );
         }
         $(".uzrunvelyofa-item").click(function () {
-            var item=data[$(this).attr("value")];
+            var item = data[$(this).attr("value")];
             showModalWithTableInside(function (head, body, modal) {
                 body.append("<div class='row'>" +
                     "<div class='col-md-3'><img style='height: 75px;' src='assets/images/phone.png'/></div>" +
-                    "<div class='col-md-9' style='background: #F7F7F7'>"+
-                    "<div>ბრენდი: <strong style='font-family: font1;'>" + item.brandName+ "</strong></div>" +
-                    "<div>მოდელი: <strong style='font-family: font1;'>"+item.modelName+"</strong></div>" +
-                    "<div>IMEI: <strong style='font-family: font1;'>"+item.imei+"</strong></div>" +
-                    "<div>ჩაბარების ფასი: <strong style='font-family: font1;'>"+item.sum+" ლარი</strong></div>" +
-                    "<div><p>კომენტარი: <strong style='font-family: font1;'>"+ item.comment+ "</strong></p></div>"+
+                    "<div class='col-md-9' style='background: #F7F7F7'>" +
+                    "<div>ბრენდი: <strong style='font-family: font1;'>" + item.brandName + "</strong></div>" +
+                    "<div>მოდელი: <strong style='font-family: font1;'>" + item.modelName + "</strong></div>" +
+                    "<div>IMEI: <strong style='font-family: font1;'>" + item.imei + "</strong></div>" +
+                    "<div>ჩაბარების ფასი: <strong style='font-family: font1;'>" + item.sum + " ლარი</strong></div>" +
+                    "<div><p>კომენტარი: <strong style='font-family: font1;'>" + item.comment + "</strong></p></div>" +
                     "</div>" +
                     "</div>");
             })
@@ -341,12 +341,45 @@ function loadLoansData(index, search) {
 
 
     }
-    
+
     function loadMovementsDataForLoan(DOMElements) {
-        
+
     }
 
-    openLoanGlobal=function (currentElement) {
+    function loadLoanDoActions(DOMElements) {
+        DOMElements.loanDoActionsDiv.html("");
+        createButtonWithHandlerr(DOMElements.loanDoActionsDiv, "გადახდა", function () {
+            showModalWithTableInside(function (head, body, modal) {
+                dynamicCreateForm(body, "makePayment", {
+                    loanId: {
+                        type: "hidden",
+                        value: "" + DOMElements.currentObj.id
+                    },
+                    paymentType:{
+                        type:"comboBox",
+                        valueField:"id",
+                        nameField:"name",
+                        name:"გადახდის ტიპი",
+                        data:[
+                            {id:"1",name:"ნაწილობრივი"},
+                            {id:"2",name:"სრული"},
+                            {id:"3",name:"პროცენტი"}
+                        ]
+                    },
+                    sum:{
+                        type: "number",
+                        name: "გადახდის თანხა"
+                    }
+                }, function () {
+                    modal.modal("hide");
+                })
+            }, function () {
+
+            }, 500)
+        })
+    }
+
+    openLoanGlobal = function (currentElement) {
         var modal6 = $("#myModal6");
 
         var tab2_1 = $("#tab2_1");
@@ -367,6 +400,7 @@ function loadLoansData(index, search) {
         var clientInfoDataPlace = $("#clientInfoDataPlace");
         var clientInfoButtonsPlace = $("#clientInfoButtonsPlace");
         var loanInfoDiv = $("#loanInfoDiv");
+        var loanDoActionsDiv = $("#loanDoActionsDiv");
         var DOMElements = {
             buttonsPanelStages: buttonsPanelStages,
             bodyPanelStages: bodyPanelStages,
@@ -381,7 +415,8 @@ function loadLoansData(index, search) {
             clientInfoDataPlace: clientInfoDataPlace,
             clientInfoButtonsPlace: clientInfoButtonsPlace,
             currentObj: currentElement,
-            loanInfoDiv:loanInfoDiv
+            loanInfoDiv: loanInfoDiv,
+            loanDoActionsDiv: loanDoActionsDiv
 
         };
 
@@ -400,7 +435,8 @@ function loadLoansData(index, search) {
         loadClientDataForLoan(DOMElements);
         loadLoanInfoData(DOMElements);
         loadUzrunvelyofaDataForLoan(DOMElements);
-        loadMovementsDataForLoan(DOMElements)
+        loadMovementsDataForLoan(DOMElements);
+        loadLoanDoActions(DOMElements);
 
 
         modal6.modal("show");
