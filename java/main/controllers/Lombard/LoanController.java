@@ -48,6 +48,15 @@ public class LoanController {
     private ClientsRepo clientsRepo;
     @Autowired
     private LoanMovementsRepo loanMovementsRepo;
+    @Autowired
+    private LoanConditionsRepo loanConditionsRepo;
+
+
+    @RequestMapping("/getloan/{id}")
+    @ResponseBody
+    public Loan getLoan(@CookieValue("projectSessionId") long sessionId,@PathVariable("id")long id){
+        return loanRepo.findOne(id);
+    }
 
     @RequestMapping("/getloans")
     @ResponseBody
@@ -84,6 +93,7 @@ public class LoanController {
                 JsonObject clientObject=mainObject.getAsJsonObject("client");
                 JsonArray mobiles=mainObject.getAsJsonArray("mobiles");
 
+                long conditionId=mainObject.get("condition").getAsLong();
                 long clientId=clientObject.get("id").getAsLong();
                 for (int i = 0; i < mobiles.size(); i++) {
                     JsonObject mobile = mobiles.get(i).getAsJsonObject();
@@ -102,6 +112,7 @@ public class LoanController {
                 Loan loan = new Loan(clientsRepo.findOne(clientId),
                         session.getUser().getFilial(),loanSum,session.getUser());
                 loan.setNumber("234432");
+                loan.setLoanCondition(loanConditionsRepo.findOne(conditionId));
                 loanRepo.save(loan);
                 mobilePhones.forEach(new Consumer<MobilePhone>() {
                     @Override
@@ -112,7 +123,7 @@ public class LoanController {
                 mobilePhoneRepo.save(mobilePhones);
                 LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(),loan);
                 loanMovementsRepo.save(loanMovement);
-
+                
                 return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
             }catch (Exception e){
                 return  new JsonMessage(JsonReturnCodes.ERROR.getCODE(),"პრობლემა მოხდა სესხის რეგისტრაციის დროს");

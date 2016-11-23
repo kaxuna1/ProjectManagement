@@ -299,6 +299,11 @@ $(document).ready(function () {
             '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
         navigation.append('<li id="loadClientsButton" class="k">' +
             '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="კლიენტები">კლიენტები</span></a></li>');
+        navigation.append('<li id="loadConditionsButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i>' +
+            '<span style="font-family: font1;" data-translate="საპროცენტო განაკვეთები">საპროცენტო განაკვეთები</span></a></li>');
+
+
         $("#loadClientsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
@@ -313,6 +318,18 @@ $(document).ready(function () {
             currentFunction=loadLoansData;
 
         });
+        $("#loadConditionsButton").click(function () {
+            $(".k").attr("class", "k");
+            $(this).attr("class", "k nav-active active");
+            loadLoanConditions();
+            currentFunction=loadLoanConditions;
+
+        });
+        
+        
+        
+        
+        
         currentFunction=loadLoansData;
         loadLoansData(0, "");
     }

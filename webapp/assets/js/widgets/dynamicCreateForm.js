@@ -155,6 +155,74 @@ function dynamicCreateToArray(div, array, data, callback) {
         div.remove();
     })
 }
+
+function dynamicChooserToCallback(div, data, callback) {
+
+    var random = Math.floor((Math.random() * 10000) + 1);
+    var random2 = Math.floor((Math.random() * 10000) + 1);
+    var key = Math.floor((Math.random() * 10000) + 1);
+    div.append("<div id='div" + random + "" + random2 + "'></div>");
+    div = div.find("#div" + random + "" + random2);
+    var element = data;
+    console.log(element);
+    if (element.type === "text") {
+
+        div.append('<div class="form-group"><label for="' + key + random + '">' + element.name + '</label>' +
+            "<input class='form-control' type='text' placeholder='" + element.name + "' value='" +
+            (element.value ? element.value : "") + "' name='" + key + "' id='" + key + random + "' />" +
+            "</div>")
+
+    }
+    if (element.type === "number") {
+
+        div.append('<div class="form-group"><label for="' + key + random + '">' + element.name + '</label>' +
+            "<input class='form-control' type='number' placeholder='" + element.name + "' value='" +
+            (element.value ? element.value : "") + "' name='" + key + "' id='" + key + random + "' />" +
+            "</div>")
+
+    }
+    if (element.type === "hidden") {
+        div.append("<input value='" + (element.value ? element.value : "") + "' type='hidden' name='" + key + random + "' id='" + key + random + "'/>")
+    }
+    if (element.type === "date") {
+        div.append('<div class="form-group"><label for="' + key + random + '">' + element.name + '</label>' +
+            "<input class='form-control' type='date' placeholder='" + element.name + "' value='" +
+            (element.value ? element.value : "") + "' name='" + key + "' id='" + key + random + "' />" +
+            "</div>")
+    }
+    if (element.type === "comboBox") {
+        div.append('<div class="form-group"><label for="' + key + random + '">' + element.name + '</label>' +
+            "<select  data-search='true' class='form-control'   value='" +
+            (element.value ? element.value : "") + "' name='" + key + "' id='" + key + random + "'>" +
+            "</select>" +
+            "</div>");
+        var localKey = key;
+        var localValueField = element.valueField;
+        var localNameField = element.nameField;
+        var localelement = element;
+        OuterFunc(localKey, localValueField, localNameField, random, element, element.IdToNameMap);
+    }
+    div.append("<button class='btn' id='save" + random + "'>შენახვა</button>");
+    div.append("<button class='btn' id='cancel" + random + "'>გაუქმება</button>");
+    $("#save" + random).click(function () {
+        var sendData = {};
+        if (data.type === "date") {
+            sendData = moment($("#" + key + random).val().trim()).toDate();
+        } else {
+            if (data.type === "number") {
+                sendData = parseFloat($("#" + key + random).val().trim());
+            }
+            sendData = $("#" + key + random).val().trim();
+        }
+        
+        callback(sendData);
+        div.remove();
+    })
+    $("#cancel" + random).click(function () {
+        callback(null);
+        div.remove();
+    })
+}
 function OuterFunc(localKey, localValueField, localNameField, random, element, IdToNameMap) {
     $.getJSON(element.url, function (result) {
         console.log(result);

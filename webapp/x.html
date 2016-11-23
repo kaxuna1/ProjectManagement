@@ -1,53 +1,34 @@
-<div class="page-content page-app mailbox">
-    <section class="app">
-        <aside class="aside-md emails-list" style="display: table-cell;">
-            <section style="padding-top: 0px;padding-left: 0px;padding-right: 0px;">
-                <div class="mailbox-page clearfix">
-                    <div class="append-icon"></div>
-                </div>
-                <ul class="nav nav-tabs text-right">
-                    <li class="emails-action">
-                        <div class="pos-rel dis-inline"><a href="#"
-                                                           style="padding-top: 0px;padding-right: 0px;padding-left: 0px;padding-bottom: 0px;background-color: transparent;"
-                                                           class="dropdown-toggle" data-toggle="dropdown"
-                                                           data-hover="dropdown" data-close-others="true"
-                                                           data-delay="300"> <i
-                                class=" icon-rounded-arrow-down-thin"></i> </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#" id="lastActionsTableAction1">მოქმედება 1</a></li>
-                                <li><a href="#" id="lastActionsTableAction2">მოქმედება 2</a></li>
-                                <li><a href="#" id="lastActionsTableAction3">მოქმედება 3</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li id="detailsTabButton" class="f-right tabButton"><a href="#recent" data-toggle="tab">tab 1</a></li>
-                    <li class="active f-right tabButton"><a href="#alphabetically" data-toggle="tab">tab 2</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade in active" id="alphabetically">
-                        <div class="messages-list withScroll show-scroll mCustomScrollbar _mCS_18" data-padding="180"
-                             data-height="window">
-                            <div class="mCustomScrollBox mCS-light" id="mCSB_18"
-                                 style="position:relative; height:100%; overflow:hidden; max-width:100%;">
-                                <div id="lastActionsContainerDiv" class="mCSB_container mCS_no_scrollbar"
-                                     style="position:relative; top:0;"></div>
-                                <div class="mCSB_scrollTools" style="position: absolute; display: none;">
-                                    <div class="mCSB_draggerContainer">
-                                        <div class="mCSB_dragger" style="position: absolute; top: 0px;"
-                                             oncontextmenu="return false;">
-                                            <div class="mCSB_dragger_bar" style="position:relative;"></div>
-                                        </div>
-                                        <div class="mCSB_draggerRail"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade " id="recent">
-                        <div id="tab2Content"></div>
-                    </div>
-                </div>
-            </section>
-        </aside>
-    </section>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <a class="" data-toggle="collapse"
+               data-parent="#accordion3" href="#collapseOne4"
+               aria-expanded="true">
+                ინფორმაცია სესხზე
+            </a>
+        </h4>
+    </div>
+    <div id="collapseOne4" class="panel-collapse collapse"
+         aria-expanded="true">
+        <div id="loanInfoDiv" class="panel-body">
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <a class="collapsed" data-toggle="collapse"
+               data-parent="#accordion3" href="#collapseOne3"
+               aria-expanded="false">
+                ინფორმაცია კლიენტზე
+            </a>
+        </h4>
+    </div>
+    <div id="collapseOne3" class="panel-collapse collapse in"
+         aria-expanded="true">
+        <div id="clientInfoButtonsPlace"></div>
+        <div id="clientInfoDataPlace" class="panel-body">
+        </div>
+    </div>
 </div>

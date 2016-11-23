@@ -2,6 +2,7 @@ package main.models.DictionaryModels;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.Lombard.Client;
+import main.models.Lombard.Dictionary.LoanCondition;
 import main.models.Lombard.Loan;
 import main.models.UserManagement.User;
 
@@ -42,6 +43,9 @@ public class Filial {
     @OneToMany(mappedBy = "filial",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Client> clients;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "filial",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<LoanCondition> loanConditions;
 
 
     public Filial(String name, String address) {
@@ -49,6 +53,8 @@ public class Filial {
         this.address = address;
         this.users=new ArrayList<User>();
         this.loans=new ArrayList<>();
+        this.clients=new ArrayList<>();
+        this.loanConditions=new ArrayList<>();
     }
     public Filial(){}
 
@@ -84,4 +90,27 @@ public class Filial {
         this.users = users;
     }
 
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
+
+    public List<Client> getClients() {
+        return clients;
+    }
+
+    public void setClients(List<Client> clients) {
+        this.clients = clients;
+    }
+
+    public List<LoanCondition> getLoanConditions() {
+        return loanConditions;
+    }
+
+    public void setLoanConditions(List<LoanCondition> loanConditions) {
+        this.loanConditions = loanConditions;
+    }
 }

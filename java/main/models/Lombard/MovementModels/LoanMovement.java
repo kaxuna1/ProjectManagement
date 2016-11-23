@@ -41,6 +41,7 @@ public class LoanMovement {
         this.active=true;
         this.createDate=new Date();
     }
+    public LoanMovement(){}
 
     public long getId() {
         return id;

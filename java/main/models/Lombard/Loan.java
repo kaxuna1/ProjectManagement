@@ -2,14 +2,17 @@ package main.models.Lombard;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.DictionaryModels.Filial;
+import main.models.Lombard.Dictionary.LoanCondition;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.MovementModels.LoanMovement;
+import main.models.Lombard.TypeEnums.LoanPaymentType;
 import main.models.UserManagement.User;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by kaxa on 11/16/16.
@@ -46,6 +49,10 @@ public class Loan {
     @JsonIgnore
     private Filial filial;
 
+    @ManyToOne
+    @JoinColumn(name = "loanConditionId")
+    private LoanCondition loanCondition;
+
     @Column
     private float loanSum;
 
@@ -65,19 +72,21 @@ public class Loan {
     private User user;
 
 
-    public Loan(Client client, Filial filial, float loanSum,User user) {
+    public Loan(Client client, Filial filial, float loanSum, User user) {
         this.client = client;
         this.filial = filial;
         this.loanSum = loanSum;
-        this.mobilePhones=new ArrayList<>();
+        this.mobilePhones = new ArrayList<>();
         this.isActive = true;
-        this.createDate=new Date();
-        this.lastModifyDate=new Date();
-        this.user=user;
-        this.movements=new ArrayList<>();
-        this.payments=new ArrayList<>();
+        this.createDate = new Date();
+        this.lastModifyDate = new Date();
+        this.user = user;
+        this.movements = new ArrayList<>();
+        this.payments = new ArrayList<>();
     }
-    public Loan(){}
+
+    public Loan() {
+    }
 
 
     public long getId() {
@@ -174,5 +183,28 @@ public class Loan {
 
     public void setPayments(List<LoanPayment> payments) {
         this.payments = payments;
+    }
+
+    public float getLeftSum() {
+        final float[] tempSum = {this.loanSum};
+        payments.forEach(new Consumer<LoanPayment>() {
+            @Override
+            public void accept(LoanPayment loanPayment) {
+                if (loanPayment.isActive()) {
+                    if (loanPayment.getType() == LoanPaymentType.PARTIAL.getCODE()) {
+                        tempSum[0] -= loanPayment.getSum();
+                    }
+                }
+            }
+        });
+        return tempSum[0];
+    }
+
+    public LoanCondition getLoanCondition() {
+        return loanCondition;
+    }
+
+    public void setLoanCondition(LoanCondition loanCondition) {
+        this.loanCondition = loanCondition;
     }
 }

@@ -44,6 +44,7 @@ public class LoanPayment {
         this.active=true;
         this.createDate=new Date();
     }
+    public LoanPayment(){}
 
     public long getId() {
         return id;
