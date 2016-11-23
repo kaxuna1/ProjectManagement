@@ -5,10 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import main.Repositorys.Lombard.ClientsRepo;
-import main.Repositorys.Lombard.LoanRepo;
-import main.Repositorys.Lombard.MobileBrandRepo;
-import main.Repositorys.Lombard.MobilePhoneRepo;
+import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
 import main.models.Enum.JsonReturnCodes;
 import main.models.JsonMessage;
@@ -17,6 +14,7 @@ import main.models.Lombard.Client;
 import main.models.Lombard.Dictionary.MobileBrand;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.Loan;
+import main.models.Lombard.MovementModels.LoanMovement;
 import main.models.RequestJsonModel;
 import main.models.UserManagement.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +44,8 @@ public class LoanController {
     private LoanRepo loanRepo;
     @Autowired
     private ClientsRepo clientsRepo;
+    @Autowired
+    private LoanMovementsRepo loanMovementsRepo;
 
     @RequestMapping("/getloans")
     @ResponseBody
@@ -95,7 +95,6 @@ public class LoanController {
             mobilePhones.add(mobilePhoneTemp);
             loanSum+=mobile.get("sum").getAsFloat();
         }
-
         Loan loan = new Loan(clientsRepo.findOne(clientId),
                 session.getUser().getFilial(),loanSum,session.getUser());
         loan.setNumber("234432");
@@ -111,6 +110,14 @@ public class LoanController {
 
 
         return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
+    }
+
+    @RequestMapping("/getloansmovements/{id}")
+    @ResponseBody
+    public List<LoanMovement> getLoansMovements(@CookieValue("projectSessionId") long sessionId, @PathVariable("id") long id){
+        Session session = sessionRepository.findOne(sessionId);
+        Loan loan = loanRepo.findOne(id);
+        return loanMovementsRepo.findByLoan(loan);
     }
 
     private Pageable constructPageSpecification(int pageIndex) {

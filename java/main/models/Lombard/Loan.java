@@ -3,6 +3,7 @@ package main.models.Lombard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.DictionaryModels.Filial;
 import main.models.Lombard.ItemClasses.MobilePhone;
+import main.models.Lombard.MovementModels.LoanMovement;
 import main.models.UserManagement.User;
 
 import javax.persistence.*;
@@ -29,6 +30,10 @@ public class Loan {
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<MobilePhone> mobilePhones;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<LoanMovement> movements;
 
     @Column
     private String number;
@@ -66,6 +71,7 @@ public class Loan {
         this.createDate=new Date();
         this.lastModifyDate=new Date();
         this.user=user;
+        this.movements=new ArrayList<>();
     }
     public Loan(){}
 
@@ -148,5 +154,13 @@ public class Loan {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<LoanMovement> getMovements() {
+        return movements;
+    }
+
+    public void setMovements(List<LoanMovement> movements) {
+        this.movements = movements;
     }
 }

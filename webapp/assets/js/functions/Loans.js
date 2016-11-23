@@ -341,6 +341,10 @@ function loadLoansData(index, search) {
 
 
     }
+    
+    function loadMovementsDataForLoan(DOMElements) {
+        
+    }
 
     openLoanGlobal=function (currentElement) {
         var modal6 = $("#myModal6");
@@ -356,7 +360,7 @@ function loadLoansData(index, search) {
         var buttonsPanelAction = $("#buttonsPanelAction");
         var bodyPanelAction = $("#bodyPanelAction");
         var projectName = $("#projectName");
-        var currentActiveActions = $("#currentActiveActions");
+        var movementsGridDiv = $("#movementsGridDiv");
         var projectCharts = $("#projectCharts");
         var uzrunvelyofaDataGridDiv = $("#uzrunvelyofaDataGridDiv");
         var projectInfoColumn2Header = $("#projectInfoColumn2Header");
@@ -371,7 +375,7 @@ function loadLoansData(index, search) {
             bodyPanelAction: bodyPanelAction,
             buttonsPanelAction: buttonsPanelAction,
             projectName: projectName,
-            currentActiveActions: currentActiveActions,
+            movementsGridDiv: movementsGridDiv,
             projectCharts: projectCharts,
             uzrunvelyofaDataGridDiv: uzrunvelyofaDataGridDiv,
             clientInfoDataPlace: clientInfoDataPlace,
@@ -396,6 +400,7 @@ function loadLoansData(index, search) {
         loadClientDataForLoan(DOMElements);
         loadLoanInfoData(DOMElements);
         loadUzrunvelyofaDataForLoan(DOMElements);
+        loadMovementsDataForLoan(DOMElements)
 
 
         modal6.modal("show");
