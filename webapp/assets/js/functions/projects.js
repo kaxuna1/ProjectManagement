@@ -90,7 +90,8 @@ function loadProjectsData(index, search) {
                     var projectCharts = $("#projectCharts");
                     var projectOtherInfo = $("#projectOtherInfo");
                     var projectInfoColumn2Header = $("#projectInfoColumn2Header");
-
+                    var projectPrarabsList = $("#projectPrarabsList");
+                    var projectPrarabAddButtonPanel=$("#projectPrarabAddButtonPanel");
                     var DOMElements = {
                         buttonsPanelStages: buttonsPanelStages,
                         bodyPanelStages: bodyPanelStages,
@@ -101,7 +102,9 @@ function loadProjectsData(index, search) {
                         projectName:projectName,
                         currentActiveActions:currentActiveActions,
                         projectCharts:projectCharts,
-                        projectOtherInfo:projectOtherInfo
+                        projectOtherInfo:projectOtherInfo,
+                        projectPrarabsList:projectPrarabsList,
+                        projectPrarabAddButtonPanel:projectPrarabAddButtonPanel
 
                     }
 
@@ -112,7 +115,6 @@ function loadProjectsData(index, search) {
                     bodyPanelAction.hide();
                     bodyPanelStages.show();
                     buttonsPanelStages.show();
-
                     buttonsPanelStages.html("");
                     bodyPanelStages.html("");
 
@@ -123,6 +125,7 @@ function loadProjectsData(index, search) {
 
                     drawCurrentProjectElementExpansesColumnChart(DOMElements);
                     listCurrentProjectActiveActions(DOMElements);
+                    listCurrentProjectPrarabs(DOMElements);
 
                     projectName.html("<strong>" + currentElement["name"]+ "</strong>")
 
@@ -146,6 +149,13 @@ function loadProjectsData(index, search) {
                                     end: {
                                         name: "უნდა დამთავრდეს",
                                         type: "date"
+                                    },
+                                    typeId:{
+                                        name: "ეტაპის ტიპი",
+                                        type: "comboBox",
+                                        valueField:"id",
+                                        nameField:"name",
+                                        url:"/getprojectstagetypes"
                                     },
                                     id: {
                                         type: "hidden",
@@ -174,7 +184,7 @@ function loadProjectsData(index, search) {
                 $("#addNewButton").click(function () {
                     $("#myModalLabel").html("ახალი პროექტის დამატება");
                     var modalBody = $("#modalBody");
-                    modalBody.html(productRegistrationFormTemplate);
+                    modalBody.html(projectRegistrationTemplate);
                     $("#registrationModalSaveButton").unbind();
 
                     $("#registrationModalSaveButton").click(function () {
@@ -376,6 +386,39 @@ function listCurrentProjectActiveActions(DOMElements){
                 '</div>' +
                 '</div>' +
                 '</div>');
+        }
+    })
+}
+function listCurrentProjectPrarabs(DOMElements) {
+    DOMElements.projectPrarabsList.html("");
+    DOMElements.projectPrarabAddButtonPanel.html("");
+    createButtonWithHandlerr(DOMElements.projectPrarabAddButtonPanel,"პრარაბის დამატება",function () {
+        showModalWithTableInside(function (header, body, modal) {
+            header.html("პროექტზე პრარაბის დამატება");
+            body.append("<div id='addPrarabForm'></div>");
+            var formBody=$("#addPrarabForm");
+            dynamicCreateForm(formBody, "/giveprojectprarab", {
+                id2:{
+                    name: "პრარაბი",
+                    type: "comboBox",
+                    valueField:"id",
+                    nameField:"nameSurname",
+                    url:"/getallprarabsforproject/"+currentProjectID
+                },
+                id1: {
+                    type: "hidden",
+                    value: "" + currentProjectID
+                }
+            }, function () {
+                modal.modal("hide");
+                listCurrentProjectPrarabs(DOMElements);
+            })
+        })
+    });
+    
+    $.getJSON("/getprojectprarabs/"+currentProjectID,function (result) {
+        for(key in result){
+            DOMElements.projectPrarabsList.append("<div>"+result[key].name+" "+result[key].surname+"</div>")
         }
     })
 }

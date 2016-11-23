@@ -5,11 +5,10 @@ package main.models.Enum;
  */
 public enum ProjectStageActionMovementType {
     Registered(1),
-    expensesAcceptedByPrarab(2),
-    expensesDeclinedByPrarab(3),
     finishedByPrarab(4),
     inProgress(5),
-    sentToPrarab(6);
+    sentToPrarab(6),
+    expectingElements(7);
 
     private int CODE;
 

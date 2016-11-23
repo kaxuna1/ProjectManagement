@@ -21,4 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	List<User> findByMostWon();
 
 	List<User> findByType(@Param("type")int type);
+
+	@Query(value = "SELECT u.* FROM users u where u.user_id not in (SELECT val2 FROM project_to_prarab where val1=:id) AND type=3",
+			nativeQuery = true)
+	List<User> findByTypeAndIdNotIn(@Param("id") long id);
 }

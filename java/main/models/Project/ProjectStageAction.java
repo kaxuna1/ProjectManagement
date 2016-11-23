@@ -214,4 +214,7 @@ public class ProjectStageAction {
     public String getStageName(){
         return projectStage.getName();
     }
+    public Long getStageId(){
+        return projectStage.getId();
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -90,6 +91,19 @@ public class ProjectController {
     @ResponseBody
     public List<User> getProejectPrarabs(@CookieValue("projectSessionId") long sessionId,@PathVariable("id") long id){
         return projectRepository.findOne(id).getPrarabs();
+    }
+    @RequestMapping("/getallprarabsforproject/{id}")
+    @ResponseBody
+    public List<User> getAllPrarabsForProjec(@CookieValue("projectSessionId") long sessionId,@PathVariable("id") long id){
+        return userRepository.findByTypeAndIdNotIn(id);
+    }
+    @RequestMapping("/loadPrarabProjects")
+    @ResponseBody
+    public List<Project> getProjectsForPrarab(@CookieValue("projectSessionId") long sessionId){
+
+        Session session=sessionRepository.findOne(sessionId);
+        User user=session.getUser();
+        return projectRepository.findForPrarab(user.getId());
     }
 
 

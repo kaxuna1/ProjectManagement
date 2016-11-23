@@ -4,7 +4,8 @@ package main.models.Enum;
  * Created by vakhtanggelashvili on 11/3/15.
  */
 public enum JsonReturnCodes {
-    Ok(0), USEREXISTS(1),
+    Ok(0),
+    USEREXISTS(1),
     ERROR(3),
     BARRCODEEXISTS(4),
     NOTLOGGEDIN(5),

@@ -1,12 +1,14 @@
 /**
  * Created by kakha on 1/14/2016.
  */
-function showModalWithTableInside(callback,callbacks) {
+function showModalWithTableInside(callback,callbacks,width) {
+    if(!width)
+        width=600
     var random=Math.floor((Math.random() * 10000) + 1);
 
     var popupTemplate =
         '<div id="promptModal'+random+ '" class="modal fade">' +
-        '  <div class="modal-dialog">' +
+        '  <div style="width: '+width+'px" class="modal-dialog">' +
         '    <div class="modal-content">' +
         '      <div class="modal-header">' +
         '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +

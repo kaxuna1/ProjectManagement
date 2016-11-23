@@ -41,7 +41,6 @@ public class ProjectStageController {
             ProjectStage projectStage=new ProjectStage(name,session.getUser(),
                     projectRepository.findOne(id),start,end,projectStageType);
             try {
-
                 projectStageRepository.save(projectStage);
                 ProjectStageMovement projectStageMovement=
                         new ProjectStageMovement(projectStage,

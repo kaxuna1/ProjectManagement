@@ -2,6 +2,7 @@ package main.models.UserManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.DictionaryModels.Filial;
+import main.models.Lombard.Loan;
 import main.models.Project.Project;
 import main.models.Project.ProjectStage;
 import main.models.Project.ProjectStageActionExpenseRequest;
@@ -59,6 +60,11 @@ public class User {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     @JsonIgnore
+    private List<Loan> loen;
+
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<ProjectStage> projectStages;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
@@ -101,6 +107,7 @@ public class User {
         this.projects=new ArrayList<>();
         this.projectStages=new ArrayList<>();
         this.projectStageActionExpenseRequests=new ArrayList<>();
+        this.loen=new ArrayList<>();
     }
 
 
@@ -190,8 +197,6 @@ public class User {
         this.personalNumber = personalNumber;
     }
 
-
-
     public List<Session> getSessions() {
         return sessions;
     }
@@ -199,9 +204,6 @@ public class User {
     public void setSessions(List<Session> sessions) {
         this.sessions = sessions;
     }
-
-
-
 
     public String getFilialName(){
         return filial.getName();
@@ -229,5 +231,17 @@ public class User {
 
     public void setProjectStageActionExpenseRequests(List<ProjectStageActionExpenseRequest> projectStageActionExpenseRequests) {
         this.projectStageActionExpenseRequests = projectStageActionExpenseRequests;
+    }
+
+    public String getNameSurname(){
+        return this.name+" "+this.surname;
+    }
+
+    public List<Loan> getLoen() {
+        return loen;
+    }
+
+    public void setLoen(List<Loan> loen) {
+        this.loen = loen;
     }
 }

@@ -4,10 +4,14 @@
 var currentPage = 0;
 var currentData;
 var projectColumns = ["#","სახელი","მისამართი","საკადასტრო"];
+var loanColumns=["#","ნომერი","კლიენტი","რაოდენობა","გაცემის თარიღი"]
 var userColumns = ["სახელი", "გვარი", "მომხმარებლის სახელი", "პირადი ნომერი", "მობილური"];
+
+var clientColumns = ["სახელი", "გვარი","პირადი ნომერი", "მობილური"];
 var filialColumns = ["სახელი", 'მისამართი'];
 var elementColumns = ["კოდი", 'სახელი'];
 var regionColumns = ["სახელი"];
+var projectStageTypeColumns = ["სახელი"];
 var formatColumns = ["სახელი", "ფასი"];
 var productRequestsColumns = ["#","ფილიალი", "თარიღი","მოთხოვნილი პროდუქტების რაოდენობა"];
 var mosataniColumns=["#","პროდუქტი","რაოდენობა","მოიტანს"];

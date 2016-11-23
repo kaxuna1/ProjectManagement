@@ -87,6 +87,18 @@
 
 
     </script>
+    <style>
+        @font-face {
+            font-family: font1;
+            src: url('assets/font.ttf');
+        }
+        *{
+            font-family: font1;
+        }
+        strong{
+            font-family: font1;
+        }
+    </style>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="description" content="admin-themes-lab">
@@ -122,8 +134,8 @@
         </div>-->
         <div style="background: #89bc23" class="sidebar-inner">
             <div class="sidebar-top">
-                <form action="search-result.html" method="post" class="searchform" id="search-results">
-                    <input type="text" class="form-control" name="keyword" placeholder="ძებნა...">
+                <form style="font-family: font1;" onkeypress="search(event.keyCode);return event.keyCode != 13;" method="post" class="searchform">
+                    <input type="text" style="font-family: font1;" class="form-control" name="keyword" id="searchText" placeholder="ძებნა...">
                 </form>
             </div>
             <div class="menu-title">
@@ -456,7 +468,8 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="myModal6" tabindex="-1" style="overflow-y:scroll" role="dialog" aria-labelledby="myModalLabel2">
+<div class="modal fade" id="myModal6" tabindex="-1" style="overflow-y:scroll" role="dialog"
+     aria-labelledby="myModalLabel2">
     <div class="modal-dialog" style="width: 90%" role="document">
         <div style="min-height: 600px" class="modal-content">
             <div class="modal-header">
@@ -471,27 +484,30 @@
                     <div class="panel" style="width: 100%">
                         <div class="panel-content">
                             <ul id="tenderNavigation" class="nav nav-tabs">
-                                <li class="active"><a href="#tab2_1" data-toggle="tab" aria-expanded="true">გეგმა</a>
+                                <li class="active"><a href="#tab2_1" data-toggle="tab" aria-expanded="true">ინფორმაცია</a>
                                 </li>
-                                <li class=""><a href="#tab2_2" data-toggle="tab" aria-expanded="false">ეტაპები</a></li>
+                                <li class=""><a href="#tab2_2" data-toggle="tab" aria-expanded="false">გადახდების ისტორია(სრული)</a></li>
                                 <li class=""><a href="#tab2_3" data-toggle="tab" aria-expanded="false">რუკა</a></li>
                             </ul>
                             <div id="tenderTabs" class="tab-content">
                                 <div class="tab-pane fade active in" id="tab2_1">
                                     <div class="col-md-12">
                                         <div class="row">
-                                            <div class="col-md-9">
+                                            <div class="col-md-7">
                                                 <h3 id="projectName"></h3>
                                                 <div class="panel-group panel-accordion dark-accordion" id="accordion2">
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading">
                                                             <h4>
-                                                                <a class="" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne2" aria-expanded="true">
-                                                                    მიმდინარე მოქმედებები
+                                                                <a class="" data-toggle="collapse"
+                                                                   data-parent="#accordion2" href="#collapseOne2"
+                                                                   aria-expanded="true">
+                                                                    გადახდების ისტორია
                                                                 </a>
                                                             </h4>
                                                         </div>
-                                                        <div id="collapseOne2" class="panel-collapse collapse in" aria-expanded="true">
+                                                        <div id="collapseOne2" class="panel-collapse collapse in"
+                                                             aria-expanded="true">
                                                             <div id="currentActiveActions" class="panel-body">
 
                                                             </div>
@@ -500,20 +516,28 @@
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading">
                                                             <h4>
-                                                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo2" aria-expanded="false">
-                                                                    გრაფიკები
+                                                                <a class="collapsed" data-toggle="collapse"
+                                                                   data-parent="#accordion2" href="#collapseTwo2"
+                                                                   aria-expanded="false">
+                                                                    დაფარვის ისტორია
                                                                 </a>
                                                             </h4>
                                                         </div>
-                                                        <div id="collapseTwo2" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                        <div id="collapseTwo2" class="panel-collapse collapse"
+                                                             aria-expanded="false" style="height: 0px;">
                                                             <ul id="graphsNavigation" class="nav nav-tabs">
-                                                                <li class="active"><a href="#tab4_1" data-toggle="tab" aria-expanded="true">პროექტის ხარჯები</a></li>
-                                                                <li class=""><a href="#tab4_2" data-toggle="tab" aria-expanded="false">გრაფიკი 2</a></li>
-                                                                <li class=""><a href="#tab4_3" data-toggle="tab" aria-expanded="false">გრაფიკი 3</a></li>
+                                                                <li class="active"><a href="#tab4_1" data-toggle="tab"
+                                                                                      aria-expanded="true">პროექტის
+                                                                    ხარჯები</a></li>
+                                                                <li class=""><a href="#tab4_2" data-toggle="tab"
+                                                                                aria-expanded="false">გრაფიკი 2</a></li>
+                                                                <li class=""><a href="#tab4_3" data-toggle="tab"
+                                                                                aria-expanded="false">გრაფიკი 3</a></li>
                                                             </ul>
                                                             <div id="graphsTabs" class="tab-content">
                                                                 <div class="tab-pane fade active in" id="tab4_1">
-                                                                    <div id="projectCharts" style="height: 300px" class="panel-body">
+                                                                    <div id="projectCharts" style="height: 300px"
+                                                                         class="panel-body">
 
                                                                     </div>
                                                                 </div>
@@ -531,21 +555,77 @@
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading">
                                                             <h4>
-                                                                <a data-toggle="collapse" data-parent="#accordion2" href="#collapseThree2" aria-expanded="false" class="collapsed">
-                                                                    კიდევ მეტი ინფო
+                                                                <a data-toggle="collapse" data-parent="#accordion2"
+                                                                   href="#collapseThree2" aria-expanded="false"
+                                                                   class="collapsed">
+                                                                    დატვირთული უზრუნველყოფა
                                                                 </a>
                                                             </h4>
                                                         </div>
-                                                        <div id="collapseThree2" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-                                                            <div id="projectOtherInfo" class="panel-body">
+                                                        <div id="collapseThree2" class="panel-collapse collapse"
+                                                             aria-expanded="false" style="height: 0px;">
+                                                            <div id="uzrunvelyofaDataGridDiv" class="panel-body">
 
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3">
-                                                <h3 id="projectInfoColumn2Header"><strong>info 2</strong></h3>
+                                            <div class="col-lg-5">
+                                                <h3 id="projectInfoColumn2Header"><strong>დამატებითი ინფორმაცია</strong>
+                                                </h3>
+                                                <div class="panel-group panel-accordion dark-accordion" id="accordion3">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a class="" data-toggle="collapse"
+                                                                   data-parent="#accordion3" href="#collapseOne3"
+                                                                   aria-expanded="true">
+                                                                    ინფორმაცია კლიენტზე
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseOne3" class="panel-collapse collapse in"
+                                                             aria-expanded="true">
+                                                            <div id="clientInfoButtonsPlace"></div>
+                                                            <div id="clientInfoDataPlace" class="panel-body">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a class="collapsed" data-toggle="collapse"
+                                                                   data-parent="#accordion3" href="#collapseOne4"
+                                                                   aria-expanded="false">
+                                                                    ინფორმაცია სესხზე
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseOne4" class="panel-collapse collapse"
+                                                             aria-expanded="true">
+                                                            <div id="loanInfoDiv" class="panel-body">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a data-toggle="collapse" data-parent="#accordion3"
+                                                                   href="#collapseThree4" aria-expanded="false"
+                                                                   class="collapsed">
+                                                                    ინფო 3
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseThree4" class="panel-collapse collapse"
+                                                             aria-expanded="false" style="height: 0px;">
+                                                            <div id="prjectInfo3" class="panel-body">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -567,6 +647,121 @@
                 </div>
             </div>
             <div id="parcelModelFooter6" class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">დახურვა</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal7" tabindex="-1" style="overflow-y:scroll" role="dialog"
+     aria-labelledby="myModalLabel7">
+    <div class="modal-dialog" style="width: 90%" role="document">
+        <div style="min-height: 600px" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel7"></h4>
+            </div>
+            <div id="modalBody7" class="modal-body">
+
+                <div style="display:inline-flex;width: 100%">
+
+                    <div class="panel" style="width: 100%">
+                        <div class="panel-content">
+                            <ul id="tenderNavigation2" class="nav nav-tabs">
+                                <li class="active"><a href="#tab7_1" data-toggle="tab" aria-expanded="true">სესხის ტიპი
+                                    1</a></li>
+                                <li class=""><a href="#tab7_2" data-toggle="tab" aria-expanded="false">სესხის ტიპი 2</a>
+                                </li>
+                                <li class=""><a href="#tab7_3" data-toggle="tab" aria-expanded="false">სესხის ტიპი 3</a>
+                                </li>
+                            </ul>
+                            <div id="tenderTabs2" class="tab-content">
+                                <div class="tab-pane fade active in" id="tab7_1">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h3 id="projectName2"></h3>
+                                                <div class="panel-group panel-accordion dark-accordion" id="accordion4">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a class="" data-toggle="collapse"
+                                                                   data-parent="#accordion4" href="#collapseOne27"
+                                                                   aria-expanded="true">
+                                                                    კლიენტის მითითება
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseOne27" class="panel-collapse collapse in"
+                                                             aria-expanded="true">
+                                                            <div id="clientChooserPlace" class="panel-body">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a data-toggle="collapse" data-parent="#accordion4"
+                                                                   href="#collapseThree27" aria-expanded="false"
+                                                                   class="collapsed">
+                                                                    უზრუნველყოფის შეყვანა
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseThree27" class="panel-collapse collapse"
+                                                             aria-expanded="false" style="height: 0px;">
+                                                            <div id="uzrunvelyofaInputPlace" class="panel-body"></div>
+                                                            <div id="uzrunvelyofaFormPlace" class="panel-body"></div>
+                                                            <div id="uzrunvelyofaGridPlace" class="panel-body"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <h3 id="projectInfoColumn2Header2"><strong>ინფორმაცია სესხზე</strong>
+                                                </h3>
+                                                <div class="panel-group panel-accordion dark-accordion" id="accordion5">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h4>
+                                                                <a class="" data-toggle="collapse"
+                                                                   data-parent="#accordion5" href="#collapseOne5"
+                                                                   aria-expanded="true">
+                                                                    ინფორმაცია სესხზე
+                                                                </a>
+                                                            </h4>
+                                                        </div>
+                                                        <div id="collapseOne5" class="panel-collapse collapse in"
+                                                             aria-expanded="true">
+                                                            <div id="loanDataBodyDiv" class="panel-body"></div>
+                                                            <div class="panel-body" id="loanActionsDiv"></div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="tab7_2">
+                                    <div id="buttonsPanel1"></div>
+                                    <div id="bodyPanel1"></div>
+                                    <div id="buttonsPanel2"></div>
+                                    <div id="bodyPanel2"></div>
+                                    <div id="buttonsPanel3"></div>
+                                    <div id="bodyPanel3">
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab7_3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ModelFooter7" class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">დახურვა</button>
             </div>
 
@@ -616,6 +811,7 @@
 <!-- Main Plugin Initialization Script -->
 <script src="assets/js/widgets/notes.js"></script>
 <script src="assets/js/Chart.js"></script>
+<script src="assets/js/jquery.noty.js"></script>
 <!-- Notes Widget -->
 
 <script src="assets/js/rivets.bundled.min.js"></script>
@@ -660,7 +856,9 @@ my functions start
 <script src="assets/js/functions/requestsfromtenders.js"></script>
 <script src="assets/js/functions/elementTypes.js"></script>
 <script src="assets/js/functions/projecStageTypes.js"></script>
-
+<script src="assets/js/functions/prarabPageProjects.js"></script>
+<script src="assets/js/functions/Clients.js"></script>
+<script src="assets/js/functions/Loans.js"></script>
 <!--
 
 my functions end
@@ -675,7 +873,7 @@ my functions end
 <!-- Tables Filtering, Sorting & Editing -->
 <!-- END PAGE SCRIPTS -->
 <style>
-    .modal-backdrop.in{
+    .modal-backdrop.in {
         opacity: 0;
     }
 </style>

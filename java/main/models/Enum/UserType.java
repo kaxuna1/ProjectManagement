@@ -8,7 +8,10 @@ public enum UserType {
     admin(2),
     prarab(3),
     manager(4),
-    shesyidvebi(5);
+    shesyidvebi(5),
+    lombardOperator(21),
+    lombardManager(22),
+    lombardClient(23);
     private int CODE;
 
     UserType(int i) {

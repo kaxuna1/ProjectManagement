@@ -264,4 +264,17 @@ public class ProjectStageActionController {
                                                         @PathVariable("id") long id){
         return projectStageActionRepository.findActiveForHierarchy(id);
     }
+    @RequestMapping("/getprojectactionsforprarab/{id}")
+    @ResponseBody
+    public List<ProjectStageAction> getprojectactionsforprarab(@CookieValue("projectSessionId") long sessionId,
+                                                               @PathVariable("id") long id){
+        return projectStageActionRepository.findByProjectForPrarab(id);
+    }
+    @RequestMapping("/getstageactionsforprarab/{id}")
+    @ResponseBody
+    public List<ProjectStageAction> getstageactionsforprarab(@CookieValue("projectSessionId") long sessionId,
+                                                               @PathVariable("id") long id){
+
+        return projectStageActionRepository.findStageActionsForPrarab(id);
+    }
 }

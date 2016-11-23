@@ -62,14 +62,10 @@ function loadExpanses(element, DOMElements) {
                             type: "comboBox",
                             valueField:"id",
                             nameField:"nameBarCode",
-                            url:"/getelements",
+                            url:"/getelements"
                         },
                         q: {
                             name: "რაოდენობა",
-                            type: "text"
-                        },
-                        p: {
-                            name: "ერთეულის ფასი",
                             type: "text"
                         },
                         a: {

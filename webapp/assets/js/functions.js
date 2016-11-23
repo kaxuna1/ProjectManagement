@@ -3,6 +3,7 @@
  */
 
 
+var currentFunction;
 
 $.getJSON("/getsessionstatus", function (result) {
     if (!result["isactive"]) {
@@ -198,14 +199,12 @@ $(document).ready(function () {
     }
 
     if (readCookie("projectUserType") === "3") {
-        navigation.append('<li id="loadProductsButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i><span data-translate="პროდუქცია">პროდუქცია</span></a></li>');
-        navigation.append('<li id="loadProductRequestsButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i><span data-translate="პროდუქციის მოთხოვნები">პროდუქციის მოთხოვნები</span></a></li>');
-        $("#loadProductsButton").click(function () {
+        navigation.append('<li id="loadProjectsButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i><span data-translate="პროექტები">პროექტები</span></a></li>');
+        $("#loadProjectsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
-            loadProductsData(0, "");
+            loadProjectsForPrarab();
         });
         $("#loadProductRequestsButton").click(function () {
             $(".k").attr("class", "k");
@@ -214,7 +213,7 @@ $(document).ready(function () {
             loadProductRequestsData(0, 2);
 
         });
-        loadProductsData(0, "");
+        loadProjectsForPrarab();
     }
     if (readCookie("projectUserType") === "4") {
         navigation.append('<li id="loadTendersButton" class="k">' +
@@ -294,7 +293,35 @@ $(document).ready(function () {
 
         loadTenders(0, 2);
     }
+
+    if(readCookie("projectUserType") === "21"){
+        navigation.append('<li id="loadLoansButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
+        navigation.append('<li id="loadClientsButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="კლიენტები">კლიენტები</span></a></li>');
+        $("#loadClientsButton").click(function () {
+            $(".k").attr("class", "k");
+            $(this).attr("class", "k nav-active active");
+            loadClientsData(0, "");
+            currentFunction=loadClientsData;
+        });
+        
+        $("#loadLoansButton").click(function () {
+            $(".k").attr("class", "k");
+            $(this).attr("class", "k nav-active active");
+            loadLoansData(0, "");
+            currentFunction=loadLoansData;
+
+        });
+        currentFunction=loadLoansData;
+        loadLoansData(0, "");
+    }
     //loadProductsData(0, "");
 });
-
+function search(e) {
+    if(e===13){
+        console.log(e)
+        currentFunction(0,$("#searchText").val());
+    }
+}
 

@@ -1,6 +1,8 @@
 package main.models.DictionaryModels;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import main.models.Lombard.Client;
+import main.models.Lombard.Loan;
 import main.models.UserManagement.User;
 
 import javax.persistence.*;
@@ -32,14 +34,23 @@ public class Filial {
     @OneToMany(mappedBy = "filial",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<User> users;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "filial",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Loan> loans;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "filial",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Client> clients;
+
+
+
     public Filial(String name, String address) {
         this.name = name;
         this.address = address;
         this.users=new ArrayList<User>();
+        this.loans=new ArrayList<>();
     }
-    public Filial(){
-
-    }
+    public Filial(){}
 
     public String getName() {
         return name;

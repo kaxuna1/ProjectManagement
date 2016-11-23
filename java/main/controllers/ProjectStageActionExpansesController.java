@@ -49,8 +49,7 @@ public class ProjectStageActionExpansesController {
     public JsonMessage create(@CookieValue("projectSessionId") long sessionId,
                               @RequestParam(value = "a", required = true, defaultValue = "0") long a,
                               @RequestParam(value = "e", required = true, defaultValue = "0") long e,
-                              @RequestParam(value = "q", required = true, defaultValue = "0") float q,
-                              @RequestParam(value = "p", required = true, defaultValue = "0") float p) {
+                              @RequestParam(value = "q", required = true, defaultValue = "0") float q) {
 
 
 
@@ -62,7 +61,7 @@ public class ProjectStageActionExpansesController {
                 projectStageActionRepository.save(projectStageAction);
                 Element element = elementRepository.findOne(e);
                 ProjectStageActionExpense projectStageActionExpense=
-                        new ProjectStageActionExpense(element,q,p,projectStageAction);
+                        new ProjectStageActionExpense(element,q,0,projectStageAction);
                 projectStageActionExpenseRepository.save(projectStageActionExpense);
                 ProjectStageActionExpenseMovement expenseMovement=
                         new ProjectStageActionExpenseMovement(projectStageActionExpense,
@@ -133,8 +132,8 @@ public class ProjectStageActionExpansesController {
                 hashMap.put(expense.getElement().getId(),value);
             }
         }
-
         return hashMap;
+
 
     }
 }

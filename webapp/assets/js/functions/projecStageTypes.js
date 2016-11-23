@@ -4,19 +4,19 @@
 
 
 function loadProjectStageTypes(){
-    $.getJSON("/getelements", function (result) {
+    $.getJSON("/getprojectstagetypes", function (result) {
         $("#dataGridHeader").html("");
         $("#dataGridBody").html("");
         $("#paginationUl").html("");
-        for (i = 0; i < elementColumns.length; i++) {
-            var currentElement = elementColumns[i];
+        for (i = 0; i < projectStageTypeColumns.length; i++) {
+            var currentElement = projectStageTypeColumns[i];
             $("#dataGridHeader").append("<th>" + currentElement + "</th>")
         }
         var dataArray = result;
         for (i = 0; i < dataArray.length; i++) {
             var currentElement = dataArray[i];
 
-            $("#dataGridBody").append("<tr value='" + i + "'   class='gridRow' ><td>" + currentElement["barcode"] + "</td><td>"+currentElement["name"] + "</td>"+
+            $("#dataGridBody").append("<tr value='" + i + "'   class='gridRow' ><td>"+currentElement["name"] + "</td>"+
                 "<td><a value='" + currentElement['id'] + "' class='deleteProduct' href='#'><i class='fa fa-times'></i></a></td>" +
                 "</tr>");
 
@@ -40,20 +40,17 @@ function loadProjectStageTypes(){
         });
         $("#addNewDiv").html('<button id="addNewButton" data-target="#myModal" class="btn btn-sm btn-dark">დამატება</button>');
         $("#addNewButton").click(function () {
-            $("#myModalLabel").html("ახალი მასალის ტიპის დამატება");
+            $("#myModalLabel").html("ახალი პროექტის ეტაპის ტიპის დამატება");
             var modalBody = $("#modalBody");
-            modalBody.html(elementRegistrationFormTemplate);
+            modalBody.html(projectStageTypeRegistrationFormTemplate);
             $("#registrationModalSaveButton").unbind();
 
             $("#registrationModalSaveButton").click(function () {
 
 
                 var registerData = {
-                    bar: $("#barcodeField").val().trim(),
                     name: $("#nameField").val().trim()
                 }
-                console.log(registerData);
-                console.log($("#importedField").is(':checked'));
                 var valid = true;
                 for (key in registerData) {
                     if (registerData[key] == "") {
@@ -62,12 +59,12 @@ function loadProjectStageTypes(){
                 }
                 if (valid) {
                     $.ajax({
-                        url: "createelement",
+                        url: "createprojectstagetype",
                         method: "POST",
                         data: registerData
                     }).done(function (msg) {
                         if (msg) {
-                            loadElementTypes();
+                            loadProjectStageTypes();
                             $('#myModal').modal("hide");
                         } else {
                             $('#myModal').modal("hide");
