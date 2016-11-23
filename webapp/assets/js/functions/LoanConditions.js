@@ -25,5 +25,40 @@ function loadLoanConditions() {
                 "</tr>");
 
         }
+        $("#addNewDiv").html(
+            '<button id="addNewButton" data-target="#myModal" style="font-family: font1;" class="btn btn-sm btn-dark">' +
+            'ახალი სესხის გაცემა' +
+            '</button>');
+        $("#addNewButton").click(function () {
+            showModalWithTableInside(function (head, body, modal) {
+                dynamicCreateForm(body,"/createcondition",{
+                    name:{
+                        type: "text",
+                        name: "სახელი"
+                    },
+                    percent:{
+                        type: "number",
+                        name: "პროცენტი"
+                    },
+                    period:{
+                        type: "number",
+                        name: "პერიოდი"
+                    },
+                    periodType:{
+                        type:"comboBox",
+                        valueField:"id",
+                        nameField:"name",
+                        name:"პერიოდის ტიპი",
+                        data:[
+                            {id:"1",name:"დღე"},
+                            {id:"2",name:"კვირა"},
+                            {id:"3",name:"თვე"}
+                        ]
+                    },
+                },function () {
+                    modal.modal("hide");
+                })
+            })
+        })
     })
 }

@@ -22,13 +22,13 @@ import java.util.function.Consumer;
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "0 * * * * *")
     public void calculatePercentsForLoans() {
         List<Loan> loanList=loanRepo.findAll();
         loanList.forEach(new Consumer<Loan>() {
             @Override
             public void accept(Loan loan) {
-                log.info(loan.getNumber()+" სესხი");
+                log.info(loan.getNumber()+" with Cron once a day");
             }
         });
     }

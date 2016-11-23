@@ -13,4 +13,7 @@ public class StaticFunctions {
 
         return true;
     }
+    public static String getStr(String string){
+        return string;
+    }
 }

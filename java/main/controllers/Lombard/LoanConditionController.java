@@ -27,8 +27,8 @@ public class LoanConditionController {
     @ResponseBody
     public JsonMessage createCondition(@CookieValue("projectSessionId") long sessionId,
                                        @RequestParam(value = "percent", required = true, defaultValue = "0") float percent,
-                                       @RequestParam(value = "percent", required = true, defaultValue = "0") int period,
-                                       @RequestParam(value = "percent", required = true, defaultValue = "0") int periodType,
+                                       @RequestParam(value = "period", required = true, defaultValue = "0") int period,
+                                       @RequestParam(value = "periodType", required = true, defaultValue = "0") int periodType,
                                        @RequestParam(value = "name", required = true, defaultValue = "NoName") String name) {
         Session session = sessionRepository.findOne(sessionId);
         if(session.isIsactive()){

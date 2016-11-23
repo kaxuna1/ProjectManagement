@@ -41,6 +41,13 @@ public class Loan {
     @JsonIgnore
     private List<LoanPayment> payments;
 
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<LoanInterest> loanInterests;
+
+    @Column
+    private Date nextInterestCalculationDate;
+
     @Column
     private String number;
 
@@ -73,6 +80,7 @@ public class Loan {
 
 
     public Loan(Client client, Filial filial, float loanSum, User user) {
+        this.loanInterests=new ArrayList<>();
         this.client = client;
         this.filial = filial;
         this.loanSum = loanSum;
@@ -199,6 +207,9 @@ public class Loan {
         });
         return tempSum[0];
     }
+    public float getInterestSum(){
+        return (this.getLeftSum()/100)*this.loanCondition.getPercent();
+    }
 
     public LoanCondition getLoanCondition() {
         return loanCondition;
@@ -206,5 +217,21 @@ public class Loan {
 
     public void setLoanCondition(LoanCondition loanCondition) {
         this.loanCondition = loanCondition;
+    }
+
+    public List<LoanInterest> getLoanInterests() {
+        return loanInterests;
+    }
+
+    public void setLoanInterests(List<LoanInterest> loanInterests) {
+        this.loanInterests = loanInterests;
+    }
+
+    public Date getNextInterestCalculationDate() {
+        return nextInterestCalculationDate;
+    }
+
+    public void setNextInterestCalculationDate(Date nextInterestCalculationDate) {
+        this.nextInterestCalculationDate = nextInterestCalculationDate;
     }
 }
