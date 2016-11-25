@@ -39,6 +39,9 @@ public class LoanInterest {
     @Column
     private boolean payed;
 
+    @Column
+    private float payedSum;
+
     public LoanInterest(Loan loan, float sum, float percent, Date dueDate) {
         this.loan = loan;
         this.sum = sum;
@@ -47,6 +50,7 @@ public class LoanInterest {
         this.createDate = new Date();
         this.active=true;
         this.payed=false;
+        this.payedSum=0;
     }
     public LoanInterest(){}
 
@@ -112,5 +116,26 @@ public class LoanInterest {
 
     public void setPayed(boolean payed) {
         this.payed = payed;
+    }
+
+    public float getPayedSum() {
+        return payedSum;
+    }
+
+    public void setPayedSum(float payedSum) {
+        this.payedSum = payedSum;
+    }
+    public float getLeftToPay(){
+        return this.sum-this.payedSum;
+    }
+
+    public void checkIfIsPayed() {
+        if(getLeftToPay()<=0){
+            this.setPayed(true);
+        }
+    }
+
+    public void addToPayedSum(float val) {
+        this.payedSum+=val;
     }
 }

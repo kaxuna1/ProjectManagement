@@ -5,8 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.jmnarloch.spring.boot.rxjava.async.ObservableSseEmitter;
 import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
+import main.Services.Service1;
+import main.StaticData;
 import main.models.Enum.JsonReturnCodes;
 import main.models.Enum.UserType;
 import main.models.JsonMessage;
@@ -28,10 +31,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import rx.Observable;
+import rx.Subscriber;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -55,6 +66,48 @@ public class LoanController {
     private LoanConditionsRepo loanConditionsRepo;
     @Autowired
     private LoanInterestRepo loanInterestRepo;
+    @Autowired
+    private Service1 service1;
+
+    @RequestMapping("/send")
+    @ResponseBody
+    public String sendMessage(String s){
+
+        StaticData.emitterHashMap.forEach(new BiConsumer<Long, SseEmitter>() {
+            @Override
+            public void accept(Long s, SseEmitter sseEmitter) {
+                try {
+                    sseEmitter.send(s+" session:"+s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return s;
+    }
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/sse")
+    public SseEmitter getSseEmitter(@CookieValue("projectSessionId") long sessionId) {
+        SseEmitter emitter;
+        if(StaticData.emitterHashMap.get(sessionId)==null){
+            emitter = new SseEmitter();
+        }else{
+            emitter=StaticData.emitterHashMap.get(sessionId);
+        }
+
+        try {
+            emitter.send("kaxa");
+            emitter.complete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return emitter;
+    }
+
+
 
     @RequestMapping("/getloan/{id}")
     @ResponseBody
@@ -129,7 +182,7 @@ public class LoanController {
                 mobilePhoneRepo.save(mobilePhones);
                 LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(), loan);
                 loanMovementsRepo.save(loanMovement);
-                loan = addFirstInterest(loan);
+                loan.addInterest();
                 loanRepo.save(loan);
                 LoanMovement loanMovementInterest = new LoanMovement("დაეკისრა პროცენტი "
                         + loan.getInterestSum() + "ლარი"
@@ -148,31 +201,29 @@ public class LoanController {
 
     }
 
-    private Loan addFirstInterest(Loan loan) {
-        DateTime dateTime = new DateTime(loan.getCreateDate());
-        DateTime dueDate = new DateTime();
-        if (loan.getLoanCondition().getPeriodType() == LoanConditionPeryodType.DAY.getCODE())
-            dueDate = dateTime.plusDays(loan.getLoanCondition().getPeriod());
-        else if (loan.getLoanCondition().getPeriodType() == LoanConditionPeryodType.WEEK.getCODE())
-            dueDate = dateTime.plusWeeks(loan.getLoanCondition().getPeriod());
-        else
-            dueDate = dateTime.plusMonths(loan.getLoanCondition().getPeriod());
-
-        LoanInterest loanInterest = new LoanInterest(loan, loan.getInterestSum(), loan.getLoanCondition().getPercent(), dueDate.toDate());
-
-        loanInterestRepo.save(loanInterest);
-
-        loan.setNextInterestCalculationDate(dateTime.toDate());
-
-        return loan;
-    }
-
     @RequestMapping("/getloansmovements/{id}")
     @ResponseBody
-    public List<LoanMovement> getLoansMovements(@CookieValue("projectSessionId") long sessionId, @PathVariable("id") long id) {
+    public List<LoanMovement> getLoansMovements(@CookieValue("projectSessionId") long sessionId,
+                                                @PathVariable("id") long id) {
         Session session = sessionRepository.findOne(sessionId);
         Loan loan = loanRepo.findOne(id);
         return loanMovementsRepo.findByLoan(loan);
+    }
+    @RequestMapping("/getloaninterests/{id}")
+    @ResponseBody
+    public List<LoanInterest> getLoanInterests(@CookieValue("projectSessionId") long sessionId, @PathVariable("id") long id){
+        Session session = sessionRepository.findOne(sessionId);
+        Loan loan = loanRepo.findOne(id);
+        return loan.getLoanInterests();
+    }
+    @RequestMapping("/addInterestToLoan/{id}")
+    @ResponseBody
+    public JsonMessage addInterestToLoan(@CookieValue("projectSessionId") long sessionId, @PathVariable("id") long id){
+        Session session = sessionRepository.findOne(sessionId);
+        Loan loan=loanRepo.findOne(id);
+        loan.addInterest();
+        loanRepo.save(loan);
+        return new JsonMessage(JsonReturnCodes.Ok.getCODE(), "ok");
     }
 
     private Pageable constructPageSpecification(int pageIndex) {

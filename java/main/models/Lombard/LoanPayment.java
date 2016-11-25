@@ -31,6 +31,12 @@ public class LoanPayment {
     private int type;
 
     @Column
+    private float usedSum;
+
+    @Column
+    private boolean usedFully;
+
+    @Column
     private boolean active;
 
     @Column
@@ -43,6 +49,8 @@ public class LoanPayment {
         this.number="123";
         this.active=true;
         this.createDate=new Date();
+        this.usedFully=false;
+        this.usedSum=0f;
     }
     public LoanPayment(){}
 
@@ -100,5 +108,29 @@ public class LoanPayment {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public float getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(float usedSum) {
+        this.usedSum = usedSum;
+    }
+
+    public boolean isUsedFully() {
+        return usedFully;
+    }
+
+    public void setUsedFully(boolean usedFully) {
+        this.usedFully = usedFully;
+    }
+
+    public float getLeftForUse(){
+        return sum-usedSum;
+    }
+
+    public void addToUsedSum(float val) {
+        this.usedSum+=val;
     }
 }

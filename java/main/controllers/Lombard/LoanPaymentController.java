@@ -14,6 +14,7 @@ import main.models.Lombard.MovementModels.LoanMovement;
 import main.models.Lombard.TypeEnums.LoanPaymentType;
 import main.models.Lombard.TypeEnums.MovementTypes;
 import main.models.UserManagement.Session;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * Created by kaxa on 11/23/16.
@@ -62,6 +65,10 @@ public class LoanPaymentController {
                                 "პროცენტის გადახდა"));
                 LoanMovement loanMovement=new LoanMovement(movementText,movementType,loan);
                 loanMovementsRepo.save(loanMovement);
+                loan=loanRepo.findOne(loan.getId());
+                loan.recalculateInterestPayments();
+                LoggerFactory.getLogger(LoanPaymentController.class).info("Can I wait???");
+                loanRepo.save(loan);
                 return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
             }catch (Exception e){
                 return new JsonMessage(JsonReturnCodes.ERROR.getCODE(),"error");
@@ -81,6 +88,19 @@ public class LoanPaymentController {
         Session session=sessionRepository.findOne(sessionId);
         return loanPaymentRepo.findFilialPayments(session.getUser().getFilial(),constructPageSpecification(page));
     }
+
+    @RequestMapping("/getloanpayments/{id}")
+    @ResponseBody
+    public List<LoanPayment> getLoanPayment(@CookieValue("projectSessionId") long sessionId,
+                                            @PathVariable("id")long id){
+        Session session=sessionRepository.findOne(sessionId);
+
+        return loanPaymentRepo.findByLoanAndActive(loanRepo.findOne(id),true);
+    }
+
+
+
+
     private Pageable constructPageSpecification(int pageIndex) {
         Pageable pageSpecification = new PageRequest(pageIndex, 5);
         return pageSpecification;

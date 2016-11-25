@@ -5,8 +5,15 @@ import main.models.DictionaryModels.Filial;
 import main.models.Lombard.Dictionary.LoanCondition;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.MovementModels.LoanMovement;
+import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
 import main.models.Lombard.TypeEnums.LoanPaymentType;
 import main.models.UserManagement.User;
+import org.joda.time.DateTime;
+import org.joda.time.PeriodType;
+import org.slf4j.LoggerFactory;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -78,9 +85,8 @@ public class Loan {
     @JoinColumn(name = "userId")
     private User user;
 
-
     public Loan(Client client, Filial filial, float loanSum, User user) {
-        this.loanInterests=new ArrayList<>();
+        this.loanInterests = new ArrayList<>();
         this.client = client;
         this.filial = filial;
         this.loanSum = loanSum;
@@ -195,20 +201,18 @@ public class Loan {
 
     public float getLeftSum() {
         final float[] tempSum = {this.loanSum};
-        payments.forEach(new Consumer<LoanPayment>() {
-            @Override
-            public void accept(LoanPayment loanPayment) {
-                if (loanPayment.isActive()) {
-                    if (loanPayment.getType() == LoanPaymentType.PARTIAL.getCODE()) {
-                        tempSum[0] -= loanPayment.getSum();
-                    }
+        payments.forEach(loanPayment -> {
+            if (loanPayment.isActive()) {
+                if (loanPayment.getType() == LoanPaymentType.PARTIAL.getCODE()) {
+                    tempSum[0] -= loanPayment.getSum();
                 }
             }
         });
         return tempSum[0];
     }
-    public float getInterestSum(){
-        return (this.getLeftSum()/100)*this.loanCondition.getPercent();
+
+    public float getInterestSum() {
+        return (this.getLeftSum() / 100) * this.loanCondition.getPercent();
     }
 
     public LoanCondition getLoanCondition() {
@@ -234,4 +238,94 @@ public class Loan {
     public void setNextInterestCalculationDate(Date nextInterestCalculationDate) {
         this.nextInterestCalculationDate = nextInterestCalculationDate;
     }
+
+    public float getInterestSumLeft() {
+        final float[] val = {0};
+        Observable.from(loanInterests).filter(new Func1<LoanInterest, Boolean>() {
+            @Override
+            public Boolean call(LoanInterest loanInterest) {
+                return !loanInterest.isPayed();
+            }
+        }).subscribe(new Action1<LoanInterest>() {
+            @Override
+            public void call(LoanInterest loanInterest) {
+                val[0] +=loanInterest.getLeftToPay();
+            }
+        });
+        return val[0];
+    }
+
+    public void recalculateInterestPayments() {
+
+        List<LoanInterest> loanInterestsLocal = new ArrayList<>();
+
+        Observable.from(loanInterests).filter(new Func1<LoanInterest, Boolean>() {
+            @Override
+            public Boolean call(LoanInterest loanInterest) {
+                return !loanInterest.isPayed();
+            }
+        }).filter(loanInterest -> !loanInterest.isPayed()).subscribe(loanInterest -> {
+            Observable.from(payments).filter(loanPayment -> !loanPayment.isUsedFully()).subscribe(loanPayment -> {
+                if (!loanInterest.isPayed()) {
+                    if (loanPayment.getLeftForUse() < loanInterest.getLeftToPay()) {
+                        loanInterest.addToPayedSum(loanPayment.getLeftForUse());
+                        loanPayment.setUsedSum(loanPayment.getSum());
+                        loanPayment.setUsedFully(true);
+
+                    } else {
+                        if (loanPayment.getLeftForUse() > loanInterest.getLeftToPay()) {
+                            loanPayment.addToUsedSum(loanInterest.getLeftToPay());
+                            loanInterest.addToPayedSum(loanInterest.getLeftToPay());
+                            loanInterest.setPayed(true);
+                        } else {
+                            loanPayment.setUsedSum(loanPayment.getSum());
+                            loanPayment.setUsedFully(true);
+                            loanInterest.setPayedSum(loanInterest.getSum());
+                        }
+                    }
+
+                }
+            });
+            //loanInterest.setPayedSum(loanInterest.getSum()-leftToPayForThisInterest[0]);
+            loanInterest.checkIfIsPayed();
+            LoggerFactory.getLogger(Loan.class).info(loanInterest.getSum() + "");
+        });
+    }
+
+    public void addInterest(){
+        this.loanInterests.add(
+                new LoanInterest(this,
+                        ((getLeftSum()/100)*this.loanCondition.getPercent()),
+                        this.loanCondition.getPercent(),new Date()));
+        DateTime dateTime=new DateTime();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.DAY.getCODE())
+            this.nextInterestCalculationDate=dateTime.plusDays(loanCondition.getPeriod()).toDate();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.WEEK.getCODE())
+            this.nextInterestCalculationDate=dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.MONTH.getCODE())
+            this.nextInterestCalculationDate=dateTime.plusMonths(loanCondition.getPeriod()).toDate();
+        this.recalculateInterestPayments();
+    }
+
+    public float getSumForLoanClose(){
+        return this.getLeftSum()+this.getInterestSumLeft();
+    }
+    public Observable<String> getNextInterestPaymentDueDate(){
+
+
+
+
+        return Observable.from(loanInterests).filter(new Func1<LoanInterest, Boolean>() {
+            @Override
+            public Boolean call(LoanInterest loanInterest) {
+                return loanInterest.isPayed();
+            }
+        }).first().map(new Func1<LoanInterest, String>() {
+            @Override
+            public String call(LoanInterest loanInterest) {
+                return loanInterest.getDueDate().getTime()+"";
+            }
+        });
+    }
+
 }

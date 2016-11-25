@@ -59,9 +59,16 @@ function loadClientsData(index, search) {
                     pn: $("#personalNumberField").val().trim()
                 };
                 var valid = true;
-                for (key in registerData) {
+                var message="";
+                if(registerData.mobile.length<9||registerData.mobile.length>12){
+                    valid=false;
+                    message="საკონტაქტო მობილურის ნომერი უნდა იყოს 9 სიმბოლო ან მეტი და 12 სიმბოლოზე ნაკლები!"
+
+                }
+                for (var key in registerData) {
                     if (registerData[key] == "") {
                         valid = false
+                        message="შეავსეთ ყველა ველი";
                     }
                 }
                 if (valid) {
@@ -84,7 +91,7 @@ function loadClientsData(index, search) {
                         }
                     })
                 } else {
-                    alert("შეავსეთ ყველა ველი რეგისტრაციისთვის")
+                    alert(message);
                 }
 
             })
