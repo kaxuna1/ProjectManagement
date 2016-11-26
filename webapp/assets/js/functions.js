@@ -296,12 +296,16 @@ $(document).ready(function () {
 
     if (readCookie("projectUserType") === "21") {
         navigation.append('<li id="loadClientsButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="კლიენტები">კლიენტები</span></a></li>');
+            '<a href="#">' +
+            '<i class="fa fa-address-book-o" aria-hidden="true"></i>' +
+            '<span style="font-family: font1;" data-translate="კლიენტები">კლიენტები</span></a></li>');
         navigation.append('<li id="loadLoansButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
+            '<a href="#">' +
+            '<i class="fa fa-balance-scale" aria-hidden="true"></i> ' +
+            '<span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
         navigation.append('<li id="loadConditionsButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i>' +
-            '<span style="font-family: font1;" data-translate="საპროცენტო განაკვეთები">საპროცენტო განაკვეთები</span></a></li>');
+            '<a href="#"><i class="fa fa-percent" aria-hidden="true"></i>' +
+            '<span style="font-family: font1;" data-translate="% განაკვეთები">% განაკვეთები</span></a></li>');
 
 
         $("#loadClientsButton").click(function () {
