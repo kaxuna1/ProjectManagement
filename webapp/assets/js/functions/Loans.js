@@ -117,12 +117,13 @@ function loadLoansData(index, search) {
 
             for (var key in data) {
                 var element = data[key];
-                var statusString = '<span class="label label-danger">' + element.personalNumber + '</span> ';
+                var statusString = '<span class="label label-default">' + element.personalNumber + '</span> '+
+                    '<span style=" margin-right: 0px" class="label label-default"><i class="fa fa-phone" aria-hidden="true"></i>' + element.mobile + '</span> ';
                 DOMElements.clientsContainerDiv.append('<div value="' + key + '" class="client-item stage-item message-item media">' +
                     '<div class="media">' +
                     '<img src="assets/images/avatars/avatar11_big.png" alt="avatar 3" width="40" class="sender-img">' +
                     '   <div class="media-body">' +
-                    '   <div class="sender">' + element.name + " " + element.surname + '</div>' +
+                    '   <div style="width: 30%;" class="sender">' + element.name + " " + element.surname + '</div>' +
                     '<div style="width: 40%;" class="subject">' + statusString + '</div>' +
                     '</div>' +
                     '</div>' +
@@ -469,10 +470,13 @@ function loadLoansData(index, search) {
             for(var key in result){
                 var element = result[key];
                 var statusString = '<span class="label label-blue">' +
-                    moment(new Date(element.createDate)).locale("ka").format("L")  + '</span>'+
-                    '<span class="label label-blue">' +
-                    moment(new Date(element.dueDate)).locale("ka").format("L")  + '</span>'+
-                    '<span class="label label-danger">' +
+                    moment(new Date(element.createDate)).locale("ka").format("L")  + ' - ' +
+                    moment(new Date(element.dueDate)).locale("ka").format("L")+
+                    '</span>'+
+
+                    '<span class="label'+(element.payed?" label-default":" label-danger")+'">' +
+
+
                     (element.payed?"გადახდილია":(element.payedSum==0?"არ არის გადახდილი":"გადახდილია "+element.payedSum+"/"
                     +element.sum+"-დან"))+ '</span>';
                 DOMElements.loanInterestsContainerDiv.append('<div value="' + key + '" class="movement-item stage-item message-item media">' +

@@ -9,7 +9,6 @@ import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
 import main.models.Lombard.TypeEnums.LoanPaymentType;
 import main.models.UserManagement.User;
 import org.joda.time.DateTime;
-import org.joda.time.PeriodType;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.functions.Action1;
@@ -19,7 +18,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by kaxa on 11/16/16.
@@ -80,6 +78,9 @@ public class Loan {
     @Column
     private Date lastModifyDate;
 
+    @Column
+    private boolean onFirstInterest;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -97,12 +98,10 @@ public class Loan {
         this.user = user;
         this.movements = new ArrayList<>();
         this.payments = new ArrayList<>();
+        this.onFirstInterest=true;
     }
-
     public Loan() {
     }
-
-
     public long getId() {
         return id;
     }
@@ -293,10 +292,6 @@ public class Loan {
     }
 
     public void addInterest(){
-        this.loanInterests.add(
-                new LoanInterest(this,
-                        ((getLeftSum()/100)*this.loanCondition.getPercent()),
-                        this.loanCondition.getPercent(),new Date()));
         DateTime dateTime=new DateTime();
         if(loanCondition.getPeriodType()== LoanConditionPeryodType.DAY.getCODE())
             this.nextInterestCalculationDate=dateTime.plusDays(loanCondition.getPeriod()).toDate();
@@ -304,28 +299,50 @@ public class Loan {
             this.nextInterestCalculationDate=dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
         if(loanCondition.getPeriodType()== LoanConditionPeryodType.MONTH.getCODE())
             this.nextInterestCalculationDate=dateTime.plusMonths(loanCondition.getPeriod()).toDate();
+        if(this.onFirstInterest)
+            this.nextInterestCalculationDate=new DateTime(this.nextInterestCalculationDate).minusDays(1).toDate();
+        this.loanInterests.add(
+                new LoanInterest(this,
+                        ((getLeftSum()/100)*this.loanCondition.PercentLogical(this.isOnFirstInterest())),
+                        this.loanCondition.PercentLogical(isOnFirstInterest()),this.nextInterestCalculationDate));
+        this.onFirstInterest=false;
+
+        this.recalculateInterestPayments();
+    }
+    public void addFirstInterest(){
+        Date date=new Date();
+        DateTime dateTime=new DateTime();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.DAY.getCODE())
+            date=dateTime.plusDays(loanCondition.getPeriod()).toDate();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.WEEK.getCODE())
+            date=dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
+        if(loanCondition.getPeriodType()== LoanConditionPeryodType.MONTH.getCODE())
+            date=dateTime.plusMonths(loanCondition.getPeriod()).toDate();
+        if(this.getLoanCondition().getFirstDayPercent()>0){
+            this.loanInterests.add(
+                    new LoanInterest(this,
+                            ((getLeftSum()/100)*this.loanCondition.getFirstDayPercent()),
+                            this.loanCondition.getFirstDayPercent(),date));
+        }
+        if(this.getLoanCondition().getPercent()==this.getLoanCondition().getFirstDayPercent()){
+            this.nextInterestCalculationDate=date;
+        }else{
+            this.nextInterestCalculationDate=new DateTime().plusDays(1).toDate();
+        }
+
         this.recalculateInterestPayments();
     }
 
     public float getSumForLoanClose(){
         return this.getLeftSum()+this.getInterestSumLeft();
     }
-    public Observable<String> getNextInterestPaymentDueDate(){
 
 
-
-
-        return Observable.from(loanInterests).filter(new Func1<LoanInterest, Boolean>() {
-            @Override
-            public Boolean call(LoanInterest loanInterest) {
-                return loanInterest.isPayed();
-            }
-        }).first().map(new Func1<LoanInterest, String>() {
-            @Override
-            public String call(LoanInterest loanInterest) {
-                return loanInterest.getDueDate().getTime()+"";
-            }
-        });
+    public boolean isOnFirstInterest() {
+        return onFirstInterest;
     }
 
+    public void setOnFirstInterest(boolean onFirstInterest) {
+        this.onFirstInterest = onFirstInterest;
+    }
 }

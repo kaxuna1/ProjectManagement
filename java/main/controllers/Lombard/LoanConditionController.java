@@ -29,11 +29,13 @@ public class LoanConditionController {
                                        @RequestParam(value = "percent", required = true, defaultValue = "0") float percent,
                                        @RequestParam(value = "period", required = true, defaultValue = "0") int period,
                                        @RequestParam(value = "periodType", required = true, defaultValue = "0") int periodType,
-                                       @RequestParam(value = "name", required = true, defaultValue = "NoName") String name) {
+                                       @RequestParam(value = "name", required = true, defaultValue = "NoName") String name,
+                                       @RequestParam(value = "firstPercent", required = true, defaultValue = "0") float firstPercent) {
         Session session = sessionRepository.findOne(sessionId);
         if(session.isIsactive()){
             try {
-                LoanCondition loanCondition = new LoanCondition(percent, period, periodType, session.getUser().getFilial(),name);
+                LoanCondition loanCondition = new LoanCondition(percent, period,
+                        periodType, session.getUser().getFilial(),name,firstPercent);
                 loanConditionsRepo.save(loanCondition);
             }catch (Exception e){
                 return new JsonMessage(JsonReturnCodes.ERROR.getCODE(), "Error");

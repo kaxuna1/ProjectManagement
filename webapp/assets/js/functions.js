@@ -46,9 +46,9 @@ $(document).ready(function () {
         navigation.append('<li id="loadStageTypesButton" class="k">' +
             '<a href="#"><i class="icon-note"></i><span data-translate="ეტაპის ტიპები">ეტაპის ტიპები</span></a></li>');
         /*navigation.append('<li id="loadAcceptedRequestsButton" class="k">' +
-            '<a href="#"><i class="icon-layers"></i><span data-translate="დადასტურებული მოთხოვნები">დადასტურებული მოთხოვნები</span></a></li>');
-        navigation.append('<li id="loadTendersButton" class="k">' +
-            '<a href="#"><i class="icon-layers"></i><span data-translate="ტენდერები">ტენდერები</span></a></li>');*/
+         '<a href="#"><i class="icon-layers"></i><span data-translate="დადასტურებული მოთხოვნები">დადასტურებული მოთხოვნები</span></a></li>');
+         navigation.append('<li id="loadTendersButton" class="k">' +
+         '<a href="#"><i class="icon-layers"></i><span data-translate="ტენდერები">ტენდერები</span></a></li>');*/
         /*navigation.append('<li id="loadRejectedByTenderUser" class="k">' +
          '<a href="#"><i class="icon-note"></i><span data-translate="უარყოფილი მოთხოვნები">უარყოფილი მოთხოვნები</span></a></li>');*/
 
@@ -124,7 +124,7 @@ $(document).ready(function () {
             loadProjectStageTypes();
 
         });
-        
+
         $("#loadAcceptedRequestsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
@@ -294,11 +294,11 @@ $(document).ready(function () {
         loadTenders(0, 2);
     }
 
-    if(readCookie("projectUserType") === "21"){
-        navigation.append('<li id="loadLoansButton" class="k">' +
-            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
+    if (readCookie("projectUserType") === "21") {
         navigation.append('<li id="loadClientsButton" class="k">' +
             '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="კლიენტები">კლიენტები</span></a></li>');
+        navigation.append('<li id="loadLoansButton" class="k">' +
+            '<a href="#"><i class="icon-note"></i><span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
         navigation.append('<li id="loadConditionsButton" class="k">' +
             '<a href="#"><i class="icon-note"></i>' +
             '<span style="font-family: font1;" data-translate="საპროცენტო განაკვეთები">საპროცენტო განაკვეთები</span></a></li>');
@@ -308,37 +308,34 @@ $(document).ready(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
             loadClientsData(0, "");
-            currentFunction=loadClientsData;
+            currentFunction = loadClientsData;
         });
-        
+
         $("#loadLoansButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
             loadLoansData(0, "");
-            currentFunction=loadLoansData;
+            currentFunction = loadLoansData;
 
         });
         $("#loadConditionsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
             loadLoanConditions();
-            currentFunction=loadLoanConditions;
+            currentFunction = loadLoanConditions;
 
         });
-        
-        
-        
-        
-        
-        currentFunction=loadLoansData;
+
+
+        currentFunction = loadLoansData;
         loadLoansData(0, "");
     }
     //loadProductsData(0, "");
 });
 function search(e) {
-    if(e===13){
+    if (e === 13) {
         console.log(e)
-        currentFunction(0,$("#searchText").val());
+        currentFunction(0, $("#searchText").val());
     }
 }
 

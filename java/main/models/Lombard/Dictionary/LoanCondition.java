@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.DictionaryModels.Filial;
 import main.models.Lombard.Loan;
 import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
+import org.hibernate.validator.constraints.br.CPF;
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,6 +31,8 @@ public class LoanCondition {
     private int periodType;
     @Column
     private String name;
+    @Column
+    private float firstDayPercent;
 
 
     @JsonIgnore
@@ -44,13 +47,14 @@ public class LoanCondition {
     private boolean active;
 
 
-    public LoanCondition(float percent, int period, int periodType,Filial filial,String name) {
+    public LoanCondition(float percent, int period, int periodType,Filial filial,String name,float firstDayPercent) {
         this.percent = percent;
         this.period = period;
         this.periodType = periodType;
         this.filial=filial;
         this.active=true;
         this.name=name;
+        this.firstDayPercent=firstDayPercent;
     }
     public LoanCondition(){}
 
@@ -62,7 +66,12 @@ public class LoanCondition {
         this.id = id;
     }
 
-    public float getPercent() {
+    public float PercentLogical(boolean secondDay) {
+        if (secondDay)
+        return percent-firstDayPercent;
+        else return percent;
+    }
+    public float getPercent(){
         return percent;
     }
 
@@ -123,5 +132,13 @@ public class LoanCondition {
                 (this.periodType== LoanConditionPeryodType.WEEK.getCODE()?" კვირა":" თვე");
 
         return this.name+" "+this.percent+"% ყოველ "+this.period+periodTypeString+"ში";
+    }
+
+    public float getFirstDayPercent() {
+        return firstDayPercent;
+    }
+
+    public void setFirstDayPercent(float firstDayPercent) {
+        this.firstDayPercent = firstDayPercent;
     }
 }

@@ -182,7 +182,7 @@ public class LoanController {
                 mobilePhoneRepo.save(mobilePhones);
                 LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(), loan);
                 loanMovementsRepo.save(loanMovement);
-                loan.addInterest();
+                loan.addFirstInterest();
                 loanRepo.save(loan);
                 LoanMovement loanMovementInterest = new LoanMovement("დაეკისრა პროცენტი "
                         + loan.getInterestSum() + "ლარი"

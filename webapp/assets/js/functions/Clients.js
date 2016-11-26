@@ -62,7 +62,7 @@ function loadClientsData(index, search) {
                 var message="";
                 if(registerData.mobile.length<9||registerData.mobile.length>12){
                     valid=false;
-                    message="საკონტაქტო მობილურის ნომერი უნდა იყოს 9 სიმბოლო ან მეტი და 12 სიმბოლოზე ნაკლები!"
+                    message="საკონტაქტო ნომერი უნდა იყოს 9 სიმბოლო ან მეტი და 12 სიმბოლოზე ნაკლები!"
 
                 }
                 for (var key in registerData) {

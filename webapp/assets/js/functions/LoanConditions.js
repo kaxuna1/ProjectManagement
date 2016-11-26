@@ -19,7 +19,8 @@ function loadLoanConditions() {
             $("#dataGridBody").append("<tr>" +
                 "<td><input value='" + currentElement["id"] + "' class='checkboxParcel' type='checkbox' /></td>" +
                 "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["name"] + "</td>" +
-                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["percent"] + "</td>" +
+                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["percent"] + "%</td>" +
+                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["firstDayPercent"] + "%</td>" +
                 "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["period"] + "</td>" +
                 "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + periodTypes[currentElement["periodType"]] + "</td>" +
                 "</tr>");
