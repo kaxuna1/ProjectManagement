@@ -600,7 +600,9 @@ function loadLoansData(index, search) {
                             result.message+" ლარის გადახდა.<br> გსურთ დახუროთ სესიხი?</strong>")
                     },{
                         "სესხის დახურვა":function () {
-
+                            showModalWithTableInside(function (head, body, modal) {
+                                body.append("daxurva page");
+                            },{},500)
                         }
                     },500);
                 }else{
