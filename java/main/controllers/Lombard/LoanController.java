@@ -16,6 +16,7 @@ import main.models.JsonMessage;
 import main.models.LoanCreateModel;
 import main.models.Lombard.Client;
 import main.models.Lombard.Dictionary.MobileBrand;
+import main.models.Lombard.ItemClasses.Laptop;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.Loan;
 import main.models.Lombard.LoanInterest;
@@ -68,6 +69,10 @@ public class LoanController {
     private LoanInterestRepo loanInterestRepo;
     @Autowired
     private Service1 service1;
+    @Autowired
+    private LaptopBrandRepo laptopBrandRepo;
+    @Autowired
+    private LaptopRepo laptopRepo;
 
     @RequestMapping("/send")
     @ResponseBody
@@ -136,23 +141,33 @@ public class LoanController {
     public JsonMessage createLoan(@CookieValue("projectSessionId") long sessionId,
                                   @RequestParam(value = "json") String jsonString) {
 
+
         Session session = sessionRepository.findOne(sessionId);
 
         if (session.isIsactive() & session.getUser().getType() == UserType.lombardOperator.getCODE()) {
 
             try {
                 List<MobilePhone> mobilePhones = new ArrayList<>();
+                List<Laptop> laptops = new ArrayList<>();
                 float loanSum = 0;
 
 
                 JsonParser jsonParser = new JsonParser();
                 Gson gson = new Gson();
+
+
+
                 JsonObject mainObject = jsonParser.parse(jsonString).getAsJsonObject();
                 JsonObject clientObject = mainObject.getAsJsonObject("client");
+
                 JsonArray mobiles = mainObject.getAsJsonArray("mobiles");
+                JsonArray laptopsJson = mainObject.getAsJsonArray("laptops");
 
                 long conditionId = mainObject.get("condition").getAsLong();
                 long clientId = clientObject.get("id").getAsLong();
+
+
+
                 for (int i = 0; i < mobiles.size(); i++) {
                     JsonObject mobile = mobiles.get(i).getAsJsonObject();
                     MobilePhone mobilePhoneTemp = new MobilePhone();
@@ -167,31 +182,51 @@ public class LoanController {
                     mobilePhones.add(mobilePhoneTemp);
                     loanSum += mobile.get("sum").getAsFloat();
                 }
+                for (int i = 0; i < laptopsJson.size(); i++) {
+                    JsonObject laptop = laptopsJson.get(i).getAsJsonObject();
+                    Laptop laptopTemp=new Laptop();
+                    laptopTemp.setActive(true);
+                    laptopTemp.setLaptopBrand(laptopBrandRepo.findOne(laptop.get("brand").getAsLong()));
+                    laptopTemp.setModel(laptop.get("model").getAsString());
+                    laptopTemp.setCpu(laptop.get("cpu").getAsString());
+                    laptopTemp.setGpu(laptop.get("gpu").getAsString());
+                    laptopTemp.setRam(laptop.get("ram").getAsString());
+                    laptopTemp.setHdd(laptop.get("hdd").getAsString());
+                    laptopTemp.setNumber("12344321");
+                    laptopTemp.setSum(laptop.get("sum").getAsFloat());
+                    laptopTemp.setComment(laptop.get("comment").getAsString());
+                    loanSum+=laptop.get("sum").getAsFloat();
+                    laptops.add(laptopTemp);
+                }
+
+
+
                 Loan loan = new Loan(clientsRepo.findOne(clientId),
                         session.getUser().getFilial(), loanSum, session.getUser());
-                loan.setNumber("234432");
                 loan.setLoanCondition(loanConditionsRepo.findOne(conditionId));
-                loanRepo.save(loan);
+                loan=loanRepo.save(loan);
+                long id=loan.getId();
+                int year=new DateTime().getYear()-2000;
+                loan.setNumber("LN"+StaticData.hashids.encode(id)+year);
+
                 final Loan finalLoan = loan;
-                mobilePhones.forEach(new Consumer<MobilePhone>() {
-                    @Override
-                    public void accept(MobilePhone mobilePhone) {
-                        mobilePhone.setLoan(finalLoan);
-                    }
-                });
-                mobilePhoneRepo.save(mobilePhones);
+                mobilePhones.forEach(mobilePhone -> mobilePhone.setLoan(finalLoan));
+                laptops.forEach(laptop -> laptop.setLoan(finalLoan));
+                mobilePhones=mobilePhoneRepo.save(mobilePhones);
+                laptops=laptopRepo.save(laptops);
+                mobilePhones.forEach(mobilePhone -> mobilePhone.setNumber("MB"+StaticData.hashids.encode(mobilePhone.getId()+year)));
+                laptops.forEach(laptop -> laptop.setNumber("LP"+StaticData.hashids.encode(laptop.getId()+year)));
+                mobilePhones=mobilePhoneRepo.save(mobilePhones);
+                laptops=laptopRepo.save(laptops);
                 LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(), loan);
                 loanMovementsRepo.save(loanMovement);
                 loan.addFirstInterest();
                 loanRepo.save(loan);
-                LoanMovement loanMovementInterest = new LoanMovement("დაეკისრა პროცენტი "
-                        + loan.getInterestSum() + "ლარი"
-                        , MovementTypes.LOAN_INTEREST_GENERATED.getCODE(), loan);
-                loanMovementsRepo.save(loanMovementInterest);
 
                 return new JsonMessage(JsonReturnCodes.Ok.getCODE(), "ok");
             } catch (Exception e) {
-                return new JsonMessage(JsonReturnCodes.ERROR.getCODE(), "პრობლემა მოხდა სესხის რეგისტრაციის დროს");
+                e.printStackTrace();
+                return new JsonMessage(JsonReturnCodes.ERROR.getCODE(), e.getMessage());
             }
 
         } else {
@@ -199,6 +234,19 @@ public class LoanController {
         }
 
 
+    }
+
+    @RequestMapping("/getsumforloanclosing/{id}")
+    @ResponseBody
+    public JsonMessage getSumForLoanClosing(@CookieValue("projectSessionId") long sessionId,
+                                            @PathVariable("id") long id){
+        Session session = sessionRepository.findOne(sessionId);
+        Loan loan = loanRepo.findOne(id);
+        if(session.getUser().getFilial().getId()==loan.getFilial().getId()){
+            return new JsonMessage(JsonReturnCodes.Ok.getCODE(),loan.getSumForLoanClose()+"");
+        }else{
+            return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),"DONTHAVEPERMISSION");
+        }
     }
 
     @RequestMapping("/getloansmovements/{id}")

@@ -3,10 +3,12 @@ package main.models.Lombard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import main.models.DictionaryModels.Filial;
 import main.models.Lombard.Dictionary.LoanCondition;
+import main.models.Lombard.ItemClasses.Laptop;
 import main.models.Lombard.ItemClasses.MobilePhone;
 import main.models.Lombard.MovementModels.LoanMovement;
 import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
 import main.models.Lombard.TypeEnums.LoanPaymentType;
+import main.models.Lombard.TypeEnums.MovementTypes;
 import main.models.UserManagement.User;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,16 @@ public class Loan {
 
     @ManyToOne
     @JoinColumn(name = "clientId")
+    @JsonIgnore
     private Client client;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<MobilePhone> mobilePhones;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Laptop> laptops;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -84,6 +91,7 @@ public class Loan {
 
     @ManyToOne
     @JoinColumn(name = "userId")
+    @JsonIgnore
     private User user;
 
     public Loan(Client client, Filial filial, float loanSum, User user) {
@@ -98,10 +106,13 @@ public class Loan {
         this.user = user;
         this.movements = new ArrayList<>();
         this.payments = new ArrayList<>();
-        this.onFirstInterest=true;
+        this.onFirstInterest = true;
+        this.laptops = new ArrayList<>();
     }
+
     public Loan() {
     }
+
     public long getId() {
         return id;
     }
@@ -248,7 +259,7 @@ public class Loan {
         }).subscribe(new Action1<LoanInterest>() {
             @Override
             public void call(LoanInterest loanInterest) {
-                val[0] +=loanInterest.getLeftToPay();
+                val[0] += loanInterest.getLeftToPay();
             }
         });
         return val[0];
@@ -291,50 +302,57 @@ public class Loan {
         });
     }
 
-    public void addInterest(){
-        DateTime dateTime=new DateTime();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.DAY.getCODE())
-            this.nextInterestCalculationDate=dateTime.plusDays(loanCondition.getPeriod()).toDate();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.WEEK.getCODE())
-            this.nextInterestCalculationDate=dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.MONTH.getCODE())
-            this.nextInterestCalculationDate=dateTime.plusMonths(loanCondition.getPeriod()).toDate();
-        if(this.onFirstInterest)
-            this.nextInterestCalculationDate=new DateTime(this.nextInterestCalculationDate).minusDays(1).toDate();
+    public void addInterest() {
+        DateTime dateTime = new DateTime();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.DAY.getCODE())
+            this.nextInterestCalculationDate = dateTime.plusDays(loanCondition.getPeriod()).toDate();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.WEEK.getCODE())
+            this.nextInterestCalculationDate = dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.MONTH.getCODE())
+            this.nextInterestCalculationDate = dateTime.plusMonths(loanCondition.getPeriod()).toDate();
+        if (this.onFirstInterest)
+            this.nextInterestCalculationDate = new DateTime(this.nextInterestCalculationDate).minusDays(1).toDate();
         this.loanInterests.add(
                 new LoanInterest(this,
-                        ((getLeftSum()/100)*this.loanCondition.PercentLogical(this.isOnFirstInterest())),
-                        this.loanCondition.PercentLogical(isOnFirstInterest()),this.nextInterestCalculationDate));
-        this.onFirstInterest=false;
+                        ((getLeftSum() / 100) * this.loanCondition.PercentLogical(this.isOnFirstInterest())),
+                        this.loanCondition.PercentLogical(isOnFirstInterest()), this.nextInterestCalculationDate));
+        this.onFirstInterest = false;
 
         this.recalculateInterestPayments();
     }
-    public void addFirstInterest(){
-        Date date=new Date();
-        DateTime dateTime=new DateTime();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.DAY.getCODE())
-            date=dateTime.plusDays(loanCondition.getPeriod()).toDate();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.WEEK.getCODE())
-            date=dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
-        if(loanCondition.getPeriodType()== LoanConditionPeryodType.MONTH.getCODE())
-            date=dateTime.plusMonths(loanCondition.getPeriod()).toDate();
-        if(this.getLoanCondition().getFirstDayPercent()>0){
+
+    public void addFirstInterest() {
+        Date date = new Date();
+        DateTime dateTime = new DateTime();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.DAY.getCODE())
+            date = dateTime.plusDays(loanCondition.getPeriod()).toDate();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.WEEK.getCODE())
+            date = dateTime.plusWeeks(loanCondition.getPeriod()).toDate();
+        if (loanCondition.getPeriodType() == LoanConditionPeryodType.MONTH.getCODE())
+            date = dateTime.plusMonths(loanCondition.getPeriod()).toDate();
+        if (this.getLoanCondition().getFirstDayPercent() > 0) {
+
+            float sum = ((getLeftSum() / 100) * this.loanCondition.getFirstDayPercent());
             this.loanInterests.add(
                     new LoanInterest(this,
-                            ((getLeftSum()/100)*this.loanCondition.getFirstDayPercent()),
-                            this.loanCondition.getFirstDayPercent(),date));
+                            sum,
+                            this.loanCondition.getFirstDayPercent(), date));
+
+            this.movements.add(new LoanMovement("დაეკისრა პროცენტი "
+                    + sum + "ლარი"
+                    , MovementTypes.LOAN_INTEREST_GENERATED.getCODE(), this));
         }
-        if(this.getLoanCondition().getPercent()==this.getLoanCondition().getFirstDayPercent()){
-            this.nextInterestCalculationDate=date;
-        }else{
-            this.nextInterestCalculationDate=new DateTime().plusDays(1).toDate();
+        if (this.getLoanCondition().getPercent() == this.getLoanCondition().getFirstDayPercent()) {
+            this.nextInterestCalculationDate = date;
+        } else {
+            this.nextInterestCalculationDate = new DateTime().plusDays(1).toDate();
         }
 
         this.recalculateInterestPayments();
     }
 
-    public float getSumForLoanClose(){
-        return this.getLeftSum()+this.getInterestSumLeft();
+    public float getSumForLoanClose() {
+        return this.getLeftSum() + this.getInterestSumLeft();
     }
 
 
@@ -344,5 +362,39 @@ public class Loan {
 
     public void setOnFirstInterest(boolean onFirstInterest) {
         this.onFirstInterest = onFirstInterest;
+    }
+
+    public List<Laptop> getLaptops() {
+        return laptops;
+    }
+
+    public void setLaptops(List<Laptop> laptops) {
+        this.laptops = laptops;
+    }
+
+    public String getClientFullName() {
+        return this.client.getName() + " " + this.client.getSurname();
+    }
+
+    public String getClientPN() {
+        return this.client.getPersonalNumber();
+    }
+    public String getClientMobile(){
+        return this.client.getMobile();
+    }
+    public String getUserFullName(){
+        return this.user.getName() + " " + this.user.getSurname();
+    }
+    public String getUserPN(){
+        return this.user.getPersonalNumber();
+    }
+    public String getConditionName(){
+        return this.loanCondition.getName();
+    }
+    public String getConditionFullName(){
+        return this.loanCondition.getFullname();
+    }
+    public long getClientId(){
+        return client.getId();
     }
 }

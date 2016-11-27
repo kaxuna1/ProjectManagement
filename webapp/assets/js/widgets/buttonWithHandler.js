@@ -18,6 +18,13 @@ function createButtonWithHandlerr(div,name,func){
                 this.obj.removeClass("disabled")
             }
         },
+        makeDark:function (dark) {
+          if(dark){
+              this.obj.addClass("btn-dark");
+          }else{
+              this.obj.removeClass("btn-dark")  
+          }
+        },
         setTitle:function (title) {
             this.obj.html(title);
         },

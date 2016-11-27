@@ -82,7 +82,7 @@ function dynamicCreateForm(div, url, data, callback) {
         div.remove();
     })
 }
-function dynamicCreateToArray(div, array, data, callback) {
+function dynamicCreateToArray(div, array, data, callback, afterDraw, beforeDelete) {
     var random = Math.floor((Math.random() * 10000) + 1);
     var random2 = Math.floor((Math.random() * 10000) + 1);
     var random3 = Math.floor((Math.random() * 10000) + 1);
@@ -148,15 +148,24 @@ function dynamicCreateToArray(div, array, data, callback) {
         }
         array.push(sendData);
         callback();
+        if (beforeDelete) {
+            beforeDelete();
+        }
         div.remove();
-    })
+    });
     $("#cancel" + random).click(function () {
+        if (beforeDelete) {
+            beforeDelete();
+        }
         callback();
         div.remove();
-    })
+    });
+    if (afterDraw) {
+        afterDraw();
+    }
 }
 
-function dynamicChooserToCallback(div, data, callback) {
+function dynamicChooserToCallback(div, data, callback,afterDraw, beforeDelete) {
 
     var random = Math.floor((Math.random() * 10000) + 1);
     var random2 = Math.floor((Math.random() * 10000) + 1);
@@ -214,14 +223,23 @@ function dynamicChooserToCallback(div, data, callback) {
             }
             sendData = $("#" + key + random).val().trim();
         }
-        
+
         callback(sendData);
+        if (beforeDelete) {
+            beforeDelete();
+        }
         div.remove();
     })
     $("#cancel" + random).click(function () {
+        if (beforeDelete) {
+            beforeDelete();
+        }
         callback(null);
         div.remove();
     })
+    if (afterDraw) {
+        afterDraw();
+    }
 }
 function OuterFunc(localKey, localValueField, localNameField, random, element, IdToNameMap) {
     $.getJSON(element.url, function (result) {

@@ -30,9 +30,10 @@ function showModalWithTableInside(callback,callbacks,width) {
         callback($(this).find("#modalWithTableHeader"+random),$(this).find("#modalWithTableBody"+random),thisModal);
 
         for (var key in callbacks) {
-            $(this).find("#modalFooterDynamic"+random).append('<button id="' + key + 'Btn" type="button" class="btn btn-link">' + key + '</button>')
-            $("#" + key + "Btn").click(function () {
-                callbacks[key]()
+            var random2=Math.floor((Math.random() * 10000) + 1);
+            $(this).find("#modalFooterDynamic"+random).append('<button id="' + random2 + 'Btn" type="button" class="btn btn-link">' + key + '</button>')
+            $("#" + random2 + "Btn").click(function () {
+                callbacks[key]();
                 thisModal.modal("hide");
 
             });

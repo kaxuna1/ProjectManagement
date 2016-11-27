@@ -1,6 +1,7 @@
 package main;
 
 import main.models.JsonMessage;
+import org.hashids.Hashids;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashMap;
@@ -10,4 +11,6 @@ import java.util.HashMap;
  */
 public class StaticData {
     public static HashMap<Long,SseEmitter> emitterHashMap=new HashMap<>();
+    public static Hashids hashids = new Hashids("this is my salt", 5, "0123456789ABCDEF");
+
 }

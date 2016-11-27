@@ -8,6 +8,7 @@ var currentLoanObj = null;
 function loadLoansData(index, search) {
     var sendLoanData = {};
     var brands = {};
+    var laptopBrands={};
     var conditions = {};
     $.getJSON("getloans?index=" + index + "&search=" + search, function (result) {
         $("#dataGridHeader").html("");
@@ -28,11 +29,11 @@ function loadLoansData(index, search) {
             console.log(currentElement["createDate"])
             $("#dataGridBody").append("<tr>" +
                 "<td><input value='" + currentElement["id"] + "' class='checkboxParcel' type='checkbox' /></td>" +
-                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["number"] + "</td>" +
-                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["client"]["name"] +
-                " " + currentElement["client"]["surname"] + "</td>" +
-                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" + currentElement["loanSum"] + "</td>" +
+                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>"+'<i class="fa fa-balance-scale" aria-hidden="true"></i> ' + currentElement["number"] + "</td>" +
+                "<td style='font-family: font1;' value='" + i + "' class='gridRow'>"+'<i class="fa fa-user-circle-o" aria-hidden="true"></i> ' + currentElement["clientFullName"] +"</td>" +
+                "<td style='font-family: font1;' value='" + i + "' class='gridRow'><img style='height: 15px;padding-bottom: 4px;;' src='assets/images/lari.png'>" + currentElement["loanSum"] + "</td>" +
                 "<td style='font-family: font1;' value='" + i + "' class='gridRow'>" +
+                    '<i class="fa fa-calendar" aria-hidden="true"></i>'+
                 moment(new Date(currentElement["createDate"])).locale("ka").format("LLLL") + "</td>" +
 
                 "<td><a value='" + currentElement['id'] + "' class='loanActionButton' href='#'> " +
@@ -67,11 +68,11 @@ function loadLoansData(index, search) {
         });
         $("#addNewDiv").html(
             '<button id="addNewButton" data-target="#myModal" style="font-family: font1;" class="btn btn-sm btn-dark">' +
-            '<i class="fa fa-cart-plus" aria-hidden="true"></i>' +
+            '<i class="fa fa-plus" aria-hidden="true"></i>' +
             ' ახალი სესხის გაცემა' +
             '</button>');
         $("#addNewButton").click(function () {
-            sendLoanData = {mobiles: []};
+            sendLoanData = {mobiles: [],laptops:[]};
             var modal7 = $("#myModal7");
             var tab7_1 = $("#tab7_1");
             var tab7_2 = $("#tab7_2");
@@ -158,9 +159,11 @@ function loadLoansData(index, search) {
     function drawLoanInfoAdder(DOMElements) {
         DOMElements.uzrunvelyofaInputPlace.html("");
         var createUzrunvelyofaButton = createButtonWithHandlerr(DOMElements.uzrunvelyofaInputPlace,
-            "უზრუნველყოფის დამატება", function () {
+            '<i class="fa fa-cart-plus" aria-hidden="true"></i> მობილურის დამატება', function () {
                 loanConditionChooserButton.enabled(false);
                 createUzrunvelyofaButton.enabled(false);
+                DOMElements.uzrunvelyofaInputPlace.slideUp("slow");
+                DOMElements.uzrunvelyofaFormPlace.slideUp();
                 brands = {};
                 dynamicCreateToArray(DOMElements.uzrunvelyofaFormPlace, sendLoanData.mobiles, {
 
@@ -188,17 +191,79 @@ function loadLoansData(index, search) {
                         name: "კომენტარი",
                         type: "text"
                     }
+                }, function (){
+                    loanConditionChooserButton.enabled(true);
+                    createUzrunvelyofaButton.enabled(true);
+                    drawUzrunvelyofaGrid(DOMElements);
+                    updateSideInfo(DOMElements);
+                    DOMElements.uzrunvelyofaInputPlace.slideDown("slow");
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideDown("slow")
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideUp("slow")
+                });
+            });
+        var createLaptopButton = createButtonWithHandlerr(DOMElements.uzrunvelyofaInputPlace,
+            '<i class="fa fa-cart-plus" aria-hidden="true"></i> ლეპტოპის დამატება', function () {
+                loanConditionChooserButton.enabled(false);
+                createUzrunvelyofaButton.enabled(false);
+                DOMElements.uzrunvelyofaInputPlace.slideUp("slow");
+                laptopBrands = {};
+                dynamicCreateToArray(DOMElements.uzrunvelyofaFormPlace, sendLoanData.laptops, {
+
+                    brand: {
+                        name: "ბრენდი",
+                        type: "comboBox",
+                        valueField: "id",
+                        nameField: "name",
+                        url: "/getlaptopbrends",
+                        IdToNameMap: laptopBrands
+                    },
+                    model: {
+                        name: "მოდელი",
+                        type: "text"
+                    },
+                    cpu: {
+                        name: "cpu",
+                        type: "text"
+                    },
+                    gpu: {
+                        name: "gpu",
+                        type: "text"
+                    },
+                    ram: {
+                        name: "ram",
+                        type: "text"
+                    },
+                    hdd: {
+                        name: "hdd",
+                        type: "text"
+                    },
+                    sum: {
+                        name: "შეფასება",
+                        type: "number"
+                    },
+                    comment: {
+                        name: "კომენტარი",
+                        type: "text"
+                    }
                 }, function () {
                     loanConditionChooserButton.enabled(true);
                     createUzrunvelyofaButton.enabled(true);
                     drawUzrunvelyofaGrid(DOMElements);
                     updateSideInfo(DOMElements);
+                    DOMElements.uzrunvelyofaInputPlace.slideDown("slow");
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideDown("slow")
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideUp("slow")
                 });
             });
         var loanConditionChooserButton = createButtonWithHandlerr(DOMElements.uzrunvelyofaInputPlace,
-            "საპროცენტო განაკვეთის მითითება", function () {
+            '<i class="fa fa-percent" aria-hidden="true"></i> განაკვეთის მითითება', function () {
                 loanConditionChooserButton.enabled(false);
                 createUzrunvelyofaButton.enabled(false);
+                DOMElements.uzrunvelyofaInputPlace.slideUp("slow");
                 dynamicChooserToCallback(DOMElements.uzrunvelyofaFormPlace, {
                     name: "საპროცენტო განაკვეთი",
                     type: "comboBox",
@@ -212,6 +277,11 @@ function loadLoansData(index, search) {
                     createUzrunvelyofaButton.enabled(true);
                     drawUzrunvelyofaGrid(DOMElements);
                     updateSideInfo(DOMElements);
+                    DOMElements.uzrunvelyofaInputPlace.slideDown("slow");
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideDown("slow")
+                },function () {
+                    DOMElements.uzrunvelyofaFormPlace.slideUp("slow")
                 })
 
             });
@@ -222,6 +292,7 @@ function loadLoansData(index, search) {
         DOMElements.uzrunvelyofaGridPlace.html(uzrunvelyofaGridTemplate);
         DOMElements.uzrunvelyofaContainerDiv = $("#uzrunvelyofaContainerDiv");
         var data = sendLoanData.mobiles;
+        var lapData= sendLoanData.laptops;
         console.log(brands);
         for (var key in data) {
             var element = data[key];
@@ -232,7 +303,24 @@ function loadLoansData(index, search) {
                 '<img src="assets/images/phone.png" alt="avatar 3" width="40" class="sender-img">' +
                 '   <div class="media-body">' +
                 '   <div class="sender">' + brands[element.brand] + " " + element.model + '</div>' +
-                '<div style="width: 40%;" class="subject">' + statusString + '<span value="' + key + '" class="remove-uzrunvelyofa label label-danger">X</span></div>' +
+                '<div style="width: 40%;" class="subject">' + statusString + '<span type="mobile" value="' + key + '" class="remove-uzrunvelyofa label label-danger">X</span></div>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+            );
+        }
+        for (var key in lapData) {
+            var element = lapData[key];
+            var statusString = '<span class="label label-danger">CPU ' + element.cpu + '</span>' +
+                '<span class="label label-danger">GPU ' + element.gpu + '</span>' +
+                '<span class="label label-danger">RAM ' + element.ram + '</span>' +
+                '<span class="label label-danger">HDD ' + element.hdd + '</span>' +
+                '<span class="label label-danger">' + element.sum + ' ლარი</span>';
+            DOMElements.uzrunvelyofaContainerDiv.append('<div value="' + key + '" class="uzrunvelyofa-item stage-item message-item media">' +
+                '<div class="media">'+
+                '   <div class="media-body">' +
+                '   <div style="width: 22%;margin-left: 17px;" class="sender">' + laptopBrands[element.brand] + " " + element.model + '</div>' +
+                '<div style="width: 70%;" class="subject">' + statusString + '<span type="laptop" value="' + key + '" class="remove-uzrunvelyofa label label-danger">X</span></div>' +
                 '</div>' +
                 '</div>' +
                 '</div>'
@@ -240,7 +328,10 @@ function loadLoansData(index, search) {
         }
         $(".remove-uzrunvelyofa").click(function () {
             var key = $(this).attr("value");
+            var type=$(this).attr("type");
+            if(type==="mobile")
             delete data[key];
+            else delete lapData[key];
             updateSideInfo(DOMElements);
             drawUzrunvelyofaGrid(DOMElements);
         })
@@ -252,6 +343,8 @@ function loadLoansData(index, search) {
         DOMElements.loanDataBodyDiv.html("");
         DOMElements.loanActionsDiv.html("");
         var enabled = true;
+        var mobile = true;
+        var laptop = true;
         var sum = 0;
         if (sendLoanData.client) {
             DOMElements.loanDataBodyDiv.append("<div>კლიენტი: <strong style='font-family: font1'>" + sendLoanData.client.name + " " + sendLoanData.client.surname + "</strong> </div>");
@@ -265,38 +358,54 @@ function loadLoansData(index, search) {
             enabled = false;
         }
         if (sendLoanData.mobiles.length > 0) {
-            DOMElements.loanDataBodyDiv.append("<div>უწრუნველყოფის ნივთები: </div>");
+            DOMElements.loanDataBodyDiv.append("<div>უზრუნველყოფის მობილურები: </div>");
             for (var mobileKey in sendLoanData.mobiles) {
                 var mobile = sendLoanData.mobiles[mobileKey];
                 sum += parseFloat(mobile.sum);
                 DOMElements.loanDataBodyDiv.append("<div><strong style='font-family: font1'> მობილური: " + brands[mobile.brand] + " " + mobile.model + " " + mobile.sum + " ლარი</strong></div>");
             }
-            DOMElements.loanDataBodyDiv.append("<div>ჯამური თანხა: <strong style='font-family: font1'>" + parseFloat(sum) + " ლარი</strong></div>");
         } else {
-            enabled = false;
+            mobile = false;
+        }
+        if (sendLoanData.laptops.length > 0) {
+            DOMElements.loanDataBodyDiv.append("<div>უზრუნველყოფის ლეპტოპები: </div>");
+            for (var lapKey in sendLoanData.laptops) {
+                var laptopObj = sendLoanData.laptops[lapKey];
+                sum += parseFloat(laptopObj.sum);
+                DOMElements.loanDataBodyDiv.append("<div><strong style='font-family: font1'> ლეპტოპი: " + laptopBrands[laptopObj.brand] + " " + laptopObj.model + " " + laptopObj.sum + " ლარი</strong></div>");
+            }
+
+        } else {
+            laptop = false;
+        }
+        if(sum>0){
+            DOMElements.loanDataBodyDiv.append("<div>ჯამური თანხა: <strong style='font-family: font1'>" + parseFloat(sum) + " ლარი</strong></div>");
         }
 
 
-        var createLoanButton = createButtonWithHandlerr(DOMElements.loanActionsDiv, "დადასტურება", function () {
-            console.log(sendLoanData);
-            $.ajax({
-                url: "createloan",
-                method: "POST",
-                data: {json: JSON.stringify(sendLoanData)}
-            }).done(function (msg) {
-                if (msg) {
-                    if (msg.code === 0) {
-                        DOMElements.modal.modal("hide")
-                        loadLoansData(0, "")
-                    }
-                } else {
+        if(enabled&&(mobile||laptop)){
+            var createLoanButton = createButtonWithHandlerr(DOMElements.loanActionsDiv, "დადასტურება", function () {
+                console.log(sendLoanData);
+                $.ajax({
+                    url: "createloan",
+                    method: "POST",
+                    data: {json: JSON.stringify(sendLoanData)}
+                }).done(function (msg) {
+                    if (msg) {
+                        if (msg.code === 0) {
+                            DOMElements.modal.modal("hide")
+                            loadLoansData(0, "")
+                        }
+                    } else {
 
-                    alert("მოხმდა შეცდომა. შეცდომის ხშირი განმეორების შემთხვევაში დაუკავშირდით ადმინისტრაციას.")
-                }
-            })
-        });
-        console.log(createLoanButton);
-        createLoanButton.enabled(enabled);
+                        alert("მოხმდა შეცდომა. შეცდომის ხშირი განმეორების შემთხვევაში დაუკავშირდით ადმინისტრაციას.")
+                    }
+                })
+            });
+            createLoanButton.makeDark(true);
+            createLoanButton.enabled(true);
+
+        }
 
     }
 
@@ -320,17 +429,16 @@ function loadLoansData(index, search) {
                     })
                 })
             });
-        DOMElements.clientProfileOpenButton = createButtonWithHandlerr(DOMElements.clientInfoButtonsPlace,
+       /* DOMElements.clientProfileOpenButton = createButtonWithHandlerr(DOMElements.clientInfoButtonsPlace,
             "პროფილის გახსნა", function () {
                 openUserGlobal(DOMElements.currentObj.client);
-            });
+            });*/
         DOMElements.clientInfoDataPlace.append("<div>კლიენტი: <strong style='font-family: font1'>" +
-            DOMElements.currentObj.client.name + " " +
-            DOMElements.currentObj.client.surname + "</strong></div>");
+            DOMElements.currentObj.clientFullName + "</strong></div>");
         DOMElements.clientInfoDataPlace.append("<div>პ/ნ: <strong style='font-family: font1'>" +
-            DOMElements.currentObj.client.personalNumber + "</strong></div>");
+            DOMElements.currentObj.clientPN+ "</strong></div>");
         DOMElements.clientInfoDataPlace.append("<div>ტელეფონი: <strong style='font-family: font1'>" +
-            DOMElements.currentObj.client.mobile + "</strong></div>");
+            DOMElements.currentObj.clientMobile + "</strong></div>");
     }
 
     function loadLoanInfoData(DOMElements) {
@@ -338,7 +446,7 @@ function loadLoansData(index, search) {
         DOMElements.loanInfoDiv.append("<div>გაცემული თანხა: <strong style='font-family: font1'>" + DOMElements.currentObj.loanSum + " ლარი</strong></div>");
         DOMElements.loanInfoDiv.append("<div>დარჩენილი გადასახდელი თანხა: <strong style='font-family: font1'>" + DOMElements.currentObj.leftSum + " ლარი</strong></div>");
         DOMElements.loanInfoDiv.append("<div>სესხის დასახურად გადასახდელი თანხა: <strong style='font-family: font1'>" + DOMElements.currentObj.sumForLoanClose + " ლარი</strong></div>");
-        DOMElements.loanInfoDiv.append("<div>საპროცენტო განაქვეთი: <strong style='font-family: font1'>" + DOMElements.currentObj.loanCondition.name + "</strong></div>");
+        DOMElements.loanInfoDiv.append("<div>საპროცენტო განაქვეთი: <strong style='font-family: font1'>" + DOMElements.currentObj.conditionName + "</strong></div>");
         DOMElements.loanInfoDiv.append("<div>მომდევნო %-ის დარიცხვის თარიღი: <strong style='font-family: font1'>" +
             moment(new Date(DOMElements.currentObj.nextInterestCalculationDate)).locale("ka").format("L") + "</strong></div>");
         DOMElements.loanInfoDiv.append("<div>მომდევნო %-ის გადახდის თარიღი: <strong style='font-family: font1'>" +
@@ -346,8 +454,8 @@ function loadLoansData(index, search) {
         DOMElements.loanInfoDiv.append("<div>დაერირცხება: <strong style='font-family: font1'>" + DOMElements.currentObj.loanCondition.percent + "% ყოველ " +
             DOMElements.currentObj.loanCondition.period + " " + periodTypes[DOMElements.currentObj.loanCondition.periodType] +
             "ში</strong></div>");
-        DOMElements.loanInfoDiv.append("<div>სესხის გამცემი: <strong style='font-family: font1'>" + DOMElements.currentObj.user.nameSurname + "</strong></div>");
-        DOMElements.loanInfoDiv.append("<div>პ/ნ: <strong style='font-family: font1'>" + DOMElements.currentObj.user.personalNumber + "</strong></div>");
+        DOMElements.loanInfoDiv.append("<div>სესხის გამცემი: <strong style='font-family: font1'>" + DOMElements.currentObj.userFullName + "</strong></div>");
+        DOMElements.loanInfoDiv.append("<div>პ/ნ: <strong style='font-family: font1'>" + DOMElements.currentObj.userPN + "</strong></div>");
 
         DOMElements.loanInfoDiv.append("<div>გაცემის დრო: <strong style='font-family: font1'>" +
             moment(new Date(DOMElements.currentObj.createDate)).locale("ka").format("LLLL") + "</strong></div>");
@@ -379,12 +487,31 @@ function loadLoansData(index, search) {
                 '</div>'
             );
         }
+        var dataLaps = DOMElements.currentObj.uzrunvelyofa.laptops;
+        for (var key in dataLaps) {
+            var element = dataLaps[key];
+            var statusString = '<span class="label label-danger">CPU ' + element.cpu + '</span>' +
+                '<span class="label label-danger">GPU ' + element.gpu + '</span>' +
+                '<span class="label label-danger">RAM ' + element.ram + '</span>' +
+                '<span class="label label-danger">HDD ' + element.hdd + '</span>' +
+                '<span class="label label-danger">' + element.sum + ' ლარი</span>';
+            DOMElements.uzrunvelyofaContainerDiv.append('<div value="' + key + '" class="uzrunvelyofa-item stage-item message-item media">' +
+                '<div class="media">'+
+                '   <div class="media-body">' +
+                '   <div style="width: 22%;margin-left: 17px;" class="sender">' + element.brandName + " " + element.model + '</div>' +
+                '<div style="width: 70%;" class="subject">' + statusString + '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+            );
+        }
         $(".uzrunvelyofa-item").click(function () {
             var item = data[$(this).attr("value")];
             showModalWithTableInside(function (head, body, modal) {
                 body.append("<div class='row'>" +
                     "<div class='col-md-3'><img style='height: 75px;' src='assets/images/phone.png'/></div>" +
                     "<div class='col-md-9' style='background: #F7F7F7'>" +
+                    "<div>შიდა ნომერი: <strong style='font-family: font1;'>" + item.number + "</strong></div>" +
                     "<div>ბრენდი: <strong style='font-family: font1;'>" + item.brandName + "</strong></div>" +
                     "<div>მოდელი: <strong style='font-family: font1;'>" + item.modelName + "</strong></div>" +
                     "<div>IMEI: <strong style='font-family: font1;'>" + item.imei + "</strong></div>" +
@@ -463,6 +590,22 @@ function loadLoansData(index, search) {
                 $.getJSON("/getloan/" + DOMElements.currentObj.id, function (result2) {
                     openLoanGlobal(result2);
                 });
+            });
+        });
+        createButtonWithHandlerr(DOMElements.loanDoActionsDiv, "სესხის დახურვა", function () {
+            $.getJSON("/getsumforloanclosing/" + DOMElements.currentObj.id, function (result) {
+                if(result.code===0){
+                    showModalWithTableInside(function (head, body, modal) {
+                        body.append("<strong style='font-family: font1'>სესიხს დასახურად საჭიროა "+
+                            result.message+" ლარის გადახდა.<br> გსურთ დახუროთ სესიხი?</strong>")
+                    },{
+                        "სესხის დახურვა":function () {
+
+                        }
+                    },500);
+                }else{
+                    alert("მოხდა შეცდომა")
+                }
             });
         });
     }

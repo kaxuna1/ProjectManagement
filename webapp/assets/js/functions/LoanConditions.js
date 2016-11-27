@@ -27,9 +27,7 @@ function loadLoanConditions() {
 
         }
         $("#addNewDiv").html(
-            '<button id="addNewButton" data-target="#myModal" style="font-family: font1;" class="btn btn-sm btn-dark">' +
-            'ახალი სესხის გაცემა' +
-            '</button>');
+            '');
         $("#addNewButton").click(function () {
             showModalWithTableInside(function (head, body, modal) {
                 dynamicCreateForm(body,"/createcondition",{

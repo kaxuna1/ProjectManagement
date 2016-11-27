@@ -78,7 +78,7 @@ public class MobilePhoneController {
                                              @RequestParam(value = "loan", required = true, defaultValue = "0") long loan){
         Session session = sessionRepository.findOne(sessionId);
         Loan loanObj = loanRepo.findOne(loan);
-        ReturnCombinedModel returnCombinedModel=new ReturnCombinedModel(loanObj.getMobilePhones(),new ArrayList<Laptop>());
+        ReturnCombinedModel returnCombinedModel=new ReturnCombinedModel(loanObj.getMobilePhones(),loanObj.getLaptops());
         return returnCombinedModel;
     }
     @RequestMapping("/getFilialPhones")

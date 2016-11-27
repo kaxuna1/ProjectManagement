@@ -25,7 +25,7 @@ function loadClientsData(index, search) {
             var currentElement = dataArray[i];
 
             $("#dataGridBody").append(
-                "<tr class='gridRow' value='"+i+"'><td>" + currentElement["name"] + "</td><td>"
+                "<tr class='gridRow' value='"+i+"'><td> "+'<i class="fa fa-user-circle-o" aria-hidden="true"></i>' + currentElement["name"] + "</td><td>"
                 + currentElement["surname"] + "</td><td>"
                 + currentElement["personalNumber"] + "</td>" +
                 "<td>" + currentElement["mobile"] + "</td></tr>"
@@ -42,7 +42,8 @@ function loadClientsData(index, search) {
         });
 
 
-        $("#addNewDiv").html('<button id="addNewButton" data-target="#myModal" class="btn btn-sm btn-dark">ახალი კლიენტის დამატება </button>')
+        $("#addNewDiv").html('<button id="addNewButton" data-target="#myModal" class="btn btn-sm btn-dark">' +
+            '<i class="fa fa-plus" aria-hidden="true"></i> ახალი კლიენტის დამატება </button>')
         $("#addNewButton").click(function () {
             $("#myModalLabel").html("ახალი კლიენტის დამატება")
             var modalBody = $("#modalBody");
