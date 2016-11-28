@@ -33,11 +33,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import rx.Observable;
 import rx.Subscriber;
 
+import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.transaction.UserTransaction;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,6 +143,7 @@ public class LoanController {
 
     @RequestMapping("/createloan")
     @ResponseBody
+    @Transactional
     public JsonMessage createLoan(@CookieValue("projectSessionId") long sessionId,
                                   @RequestParam(value = "json") String jsonString) {
 
@@ -208,6 +214,7 @@ public class LoanController {
                 long id=loan.getId();
                 int year=new DateTime().getYear()-2000;
                 loan.setNumber("LN"+StaticData.hashids.encode(id)+year);
+
 
                 final Loan finalLoan = loan;
                 mobilePhones.forEach(mobilePhone -> mobilePhone.setLoan(finalLoan));

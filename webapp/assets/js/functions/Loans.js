@@ -601,8 +601,23 @@ function loadLoansData(index, search) {
                     },{
                         "სესხის დახურვა":function () {
                             showModalWithTableInside(function (head, body, modal) {
-                                body.append("daxurva page");
-                            },{},500)
+                                body.append("გსურთ დააფიქსიროთ "+result.message+" ლარის გადახდა " +
+                                    "და დახუროთ სესხი?");
+                            },{"კი":function () {
+                                $.ajax({
+                                    url:"makePayment",
+                                    data:{
+                                        loanId:DOMElements.currentObj.id,
+                                        paymentType:2,
+                                        sum:result.message
+                                    }
+                                }).done(function (result) {
+                                    console.log(result);
+                                    if(result.code===0){
+                                        alert("გადახდა დაფიქსირდა წარმატებით!")
+                                    }
+                                })
+                            }},500)
                         }
                     },500);
                 }else{

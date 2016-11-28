@@ -13,6 +13,7 @@ import main.models.UserManagement.User;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -38,18 +39,18 @@ public class Loan {
     @JsonIgnore
     private Client client;
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<MobilePhone> mobilePhones;
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Laptop> laptops;
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<LoanMovement> movements;
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<LoanPayment> payments;
 
@@ -269,12 +270,8 @@ public class Loan {
 
         List<LoanInterest> loanInterestsLocal = new ArrayList<>();
 
-        Observable.from(loanInterests).filter(new Func1<LoanInterest, Boolean>() {
-            @Override
-            public Boolean call(LoanInterest loanInterest) {
-                return !loanInterest.isPayed();
-            }
-        }).filter(loanInterest -> !loanInterest.isPayed()).subscribe(loanInterest -> {
+        Observable.from(loanInterests).filter(loanInterest -> !loanInterest.isPayed()).filter(loanInterest -> !loanInterest.isPayed()).subscribe(loanInterest -> {
+
             Observable.from(payments).filter(loanPayment -> !loanPayment.isUsedFully()).subscribe(loanPayment -> {
                 if (!loanInterest.isPayed()) {
                     if (loanPayment.getLeftForUse() < loanInterest.getLeftToPay()) {
@@ -379,22 +376,28 @@ public class Loan {
     public String getClientPN() {
         return this.client.getPersonalNumber();
     }
-    public String getClientMobile(){
+
+    public String getClientMobile() {
         return this.client.getMobile();
     }
-    public String getUserFullName(){
+
+    public String getUserFullName() {
         return this.user.getName() + " " + this.user.getSurname();
     }
-    public String getUserPN(){
+
+    public String getUserPN() {
         return this.user.getPersonalNumber();
     }
-    public String getConditionName(){
+
+    public String getConditionName() {
         return this.loanCondition.getName();
     }
-    public String getConditionFullName(){
+
+    public String getConditionFullName() {
         return this.loanCondition.getFullname();
     }
-    public long getClientId(){
+
+    public long getClientId() {
         return client.getId();
     }
 }
