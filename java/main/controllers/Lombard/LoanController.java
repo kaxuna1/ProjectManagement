@@ -129,9 +129,13 @@ public class LoanController {
     @ResponseBody
     public Page<Loan> getLoans(@CookieValue("projectSessionId") long sessionId,
                                @RequestParam(value = "index", required = true, defaultValue = "0") int index,
-                               @RequestParam(value = "search", required = true, defaultValue = "") String search) {
+                               @RequestParam(value = "search", required = true, defaultValue = "") String search,
+                               @RequestParam(value = "closed", required = true, defaultValue = "false") boolean closed) {
         Session session = sessionRepository.findOne(sessionId);
-        return loanRepo.findMyFilialLoans(search, session.getUser().getFilial(), constructPageSpecification(index));
+        if(!search.isEmpty())
+            return loanRepo.findMyFilialLoansWithSearch(search, session.getUser().getFilial(),closed, constructPageSpecification(index));
+        else
+            return loanRepo.findMyFilialLoans(session.getUser().getFilial(),closed,constructPageSpecification(index));
     }
 
     @RequestMapping("/getClientloans/{id}")
@@ -282,7 +286,7 @@ public class LoanController {
     }
 
     private Pageable constructPageSpecification(int pageIndex) {
-        Pageable pageSpecification = new PageRequest(pageIndex, 5);
+        Pageable pageSpecification = new PageRequest(pageIndex, 30);
         return pageSpecification;
     }
 

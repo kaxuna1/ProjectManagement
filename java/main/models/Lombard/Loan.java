@@ -27,7 +27,12 @@ import java.util.List;
  */
 
 @Entity
-@Table(name = "Loans")
+@Table(name = "Loans", indexes = {
+        @Index(name = "clientIndex", columnList = "clientId", unique = false),
+        @Index(name = "loanNumberIndex", columnList = "number", unique = false),
+        @Index(name = "isActiveIndex", columnList = "isActive", unique = false)
+
+})
 public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -89,6 +94,12 @@ public class Loan {
     @Column
     private boolean onFirstInterest;
 
+    @Column
+    private boolean closed;
+
+    @Column
+    private Date closeDate;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -109,6 +120,7 @@ public class Loan {
         this.payments = new ArrayList<>();
         this.onFirstInterest = true;
         this.laptops = new ArrayList<>();
+        this.closed = false;
     }
 
     public Loan() {
@@ -243,7 +255,10 @@ public class Loan {
     }
 
     public Date getNextInterestCalculationDate() {
-        return nextInterestCalculationDate;
+        if (!this.isClosed())
+            return nextInterestCalculationDate;
+        else
+            return null;
     }
 
     public void setNextInterestCalculationDate(Date nextInterestCalculationDate) {
@@ -295,8 +310,8 @@ public class Loan {
             });
             //loanInterest.setPayedSum(loanInterest.getSum()-leftToPayForThisInterest[0]);
             loanInterest.checkIfIsPayed();
-            LoggerFactory.getLogger(Loan.class).info(loanInterest.getSum() + "");
         });
+        this.tryClosingLoan();
     }
 
     public void addInterest() {
@@ -352,7 +367,6 @@ public class Loan {
         return this.getLeftSum() + this.getInterestSumLeft();
     }
 
-
     public boolean isOnFirstInterest() {
         return onFirstInterest;
     }
@@ -399,5 +413,79 @@ public class Loan {
 
     public long getClientId() {
         return client.getId();
+    }
+
+    public void makePaymentForClosing(Float sum) {
+        if (sum == this.getSumForLoanClose()) {
+            float sumForUse = sum;
+            if (this.getInterestSumLeft() > 0) {
+                sumForUse -= this.getInterestSumLeft();
+                LoanPayment loanPayment = new LoanPayment(this, this.getInterestSumLeft(), LoanPaymentType.PERCENT.getCODE());
+                this.getPayments().add(loanPayment);
+                LoanMovement loanMovement = new LoanMovement("პროცენტის გადახდა", MovementTypes.LOAN_PAYMENT_MADE_PERCENT.getCODE(), this);
+                this.movements.add(loanMovement);
+            }
+            LoanPayment loanPaymentPartial = new LoanPayment(this, sumForUse, LoanPaymentType.PARTIAL.getCODE());
+            loanPaymentPartial.setUsedFully(true);
+            loanPaymentPartial.setUsedSum(loanPaymentPartial.getSum());
+            this.getPayments().add(loanPaymentPartial);
+            LoanMovement loanMovement2 = new LoanMovement("ძირის დაფარვა", MovementTypes.LOAN_PAYMENT_MADE_PARTIAL.getCODE(), this);
+            this.movements.add(loanMovement2);
+            this.recalculateInterestPayments();
+        } else {
+            if (sum < this.getSumForLoanClose()) {
+                float leftForPayment = sum - getInterestSumLeft();
+                if (this.getInterestSumLeft() > 0) {
+                    this.makePayment(sum > this.getInterestSumLeft() ?
+                            this.getInterestSumLeft() : sum, LoanPaymentType.PERCENT.getCODE());
+                    this.movements.add(new LoanMovement("პროცენტის გადახდა",
+                            MovementTypes.LOAN_PAYMENT_MADE_PERCENT.getCODE(), this));
+                }
+                if ((leftForPayment) > 0) {
+                    this.makePayment(leftForPayment, LoanPaymentType.PARTIAL.getCODE());
+                    this.movements.add(new LoanMovement("ძირის გადახდა",
+                            MovementTypes.LOAN_PAYMENT_MADE_PARTIAL.getCODE(), this));
+                }
+            }
+
+        }
+    }
+
+    private void tryClosingLoan() {
+        if (this.getSumForLoanClose() <= 0 && !this.isClosed()) {
+            LoanMovement loanMovement = new LoanMovement("სესხი დაიხურა", MovementTypes.LOAN_CLOSED.getCODE(), this);
+            this.movements.add(loanMovement);
+            this.closed = true;
+            this.closeDate = new Date();
+        }
+    }
+
+    public void makePayment(float sum, int paymentType) {
+
+        this.payments.add(new LoanPayment(this, sum, paymentType));
+        int movementType = (paymentType == LoanPaymentType.FULL.getCODE() ? MovementTypes.LOAN_PAYMENT_MADE_FULL.getCODE() :
+                (paymentType == LoanPaymentType.PARTIAL.getCODE() ? MovementTypes.LOAN_PAYMENT_MADE_PARTIAL.getCODE() :
+                        MovementTypes.LOAN_PAYMENT_MADE_PERCENT.getCODE()));
+        String movementText = (paymentType == LoanPaymentType.FULL.getCODE() ? "სესხის სრულიად დაფარვა" :
+                (paymentType == LoanPaymentType.PARTIAL.getCODE() ? "სესხის ნაწილობრივი დაფარვა" :
+                        "პროცენტის გადახდა"));
+        this.movements.add(new LoanMovement(movementText, movementType, this));
+        this.recalculateInterestPayments();
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
+
+    public Date getCloseDate() {
+        return closeDate;
+    }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
     }
 }

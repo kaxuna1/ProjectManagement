@@ -120,7 +120,8 @@ openUserGlobal=function (currentElement) {
             for(key in result){
                 var item= result[key];
                 var statusString = '<span class="label label-danger"> სტატუსი' + /*item.imei + */'</span>' +
-                    '<span class="label label-danger">' + item.loanSum + ' ლარი</span>';
+                    '<span class="label label-danger">' + item.loanSum + ' ლარი</span>' +
+                    (item.closed?'<span class="label label-danger">დახურული</span>':"");
                 clientLoansContainerDiv.append('<div value="' + key + '" class="client-loan stage-item message-item media">' +
                     '<div class="media">' +
                     '<img src="assets/images/avatars/avatar11_big.png" alt="avatar 3" width="40" class="sender-img">' +

@@ -60,46 +60,10 @@ public class LoanPaymentController {
 
 
                 if(paymentType==LoanPaymentType.FULL.getCODE()){
-                    if(sum==loan.getSumForLoanClose()){
-                        float sumForUse=sum;
-                        sumForUse-=loan.getInterestSumLeft();
-
-                        LoanPayment loanPayment = new LoanPayment(loan,loan.getInterestSumLeft(),LoanPaymentType.PERCENT.getCODE());
-                        loan.getPayments().add(loanPayment);
-
-                        LoanMovement loanMovement=new LoanMovement("პროცენტის გადახდა",MovementTypes.LOAN_PAYMENT_MADE_PERCENT.getCODE(),loan);
-                        loanMovementsRepo.save(loanMovement);
-
-                        LoanPayment loanPaymentPartial=new LoanPayment(loan,sumForUse,LoanPaymentType.PARTIAL.getCODE());
-                        loanPaymentPartial.setUsedFully(true);
-                        loanPaymentPartial.setUsedSum(loanPaymentPartial.getSum());
-                        loan.getPayments().add(loanPaymentPartial);
-
-                        loan=loanRepo.save(loan);
-
-                        LoanMovement loanMovement2=new LoanMovement("ძირის დაფარვა",MovementTypes.LOAN_PAYMENT_MADE_PARTIAL.getCODE(),loan);
-                        loanMovementsRepo.save(loanMovement2);
-
-                        List<LoanPayment>payments=loan.getPayments();
-                        loan.recalculateInterestPayments();
-                        loanRepo.save(loan);
-                    }else{
-
-                    }
-
+                    loan.makePaymentForClosing(sum);
+                    loanRepo.save(loan);
                 }else{
-                    LoanPayment loanPayment = new LoanPayment(loan,sum,paymentType);
-                    loanPaymentRepo.save(loanPayment);
-                    int movementType=(paymentType== LoanPaymentType.FULL.getCODE()? MovementTypes.LOAN_PAYMENT_MADE_FULL.getCODE():
-                            (paymentType== LoanPaymentType.PARTIAL.getCODE()?MovementTypes.LOAN_PAYMENT_MADE_PARTIAL.getCODE():
-                                    MovementTypes.LOAN_PAYMENT_MADE_PERCENT.getCODE()));
-                    String movementText=(paymentType== LoanPaymentType.FULL.getCODE()? "სესხის სრულიად დაფარვა":
-                            (paymentType== LoanPaymentType.PARTIAL.getCODE()?"სესხის ნაწილობრივი დაფარვა":
-                                    "პროცენტის გადახდა"));
-                    LoanMovement loanMovement=new LoanMovement(movementText,movementType,loan);
-                    loanMovementsRepo.save(loanMovement);
-                    loan=loanRepo.findOne(loan.getId());
-                    loan.recalculateInterestPayments();
+                    loan.makePayment(sum,paymentType);
                     loanRepo.save(loan);
                 }
                 return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");

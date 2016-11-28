@@ -13,14 +13,19 @@ import java.util.List;
  */
 
 @Entity
-@Table(name = "Clients")
+@Table(name = "Clients", indexes = {
+        @Index(name = "personalNumberIndex", columnList = "personalNumber", unique = true),
+        @Index(name = "nameIndex",columnList = "name"),
+        @Index(name = "surNameIndex",columnList = "surname"),
+        @Index(name = "filialIndex",columnList = "filialId")
+})
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "clientId")
     private long id;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Loan> loans;
 
@@ -57,12 +62,14 @@ public class Client {
         this.personalNumber = personalNumber;
         this.mobile = mobile;
         this.filial = filial;
-        this.loans=new ArrayList<>();
-        this.isActive=true;
-        this.createDate=new Date();
+        this.loans = new ArrayList<>();
+        this.isActive = true;
+        this.createDate = new Date();
 
     }
-    public Client(){}
+
+    public Client() {
+    }
 
     public long getId() {
         return id;

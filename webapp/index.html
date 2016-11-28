@@ -133,7 +133,7 @@
                 <a href="index.html"></a>
             </h1>
         </div>-->
-        <div style="background: #89bc23" class="sidebar-inner">
+        <div  class="sidebar-inner">
             <div class="sidebar-top">
                 <form style="font-family: font1;" onkeypress="search(event.keyCode);return event.keyCode != 13;" method="post" class="searchform">
                     <input type="text" style="font-family: font1;" class="form-control" name="keyword" id="searchText" placeholder="ძებნა...">
@@ -157,7 +157,7 @@
     <!-- END SIDEBAR -->
     <div class="main-content">
         <!-- BEGIN TOPBAR -->
-        <div style="background: #89bc23" class="topbar">
+        <div  class="topbar">
             <div class="header-left">
                 <div class="topnav">
                     <a class="menutoggle" href="#" data-toggle="sidebar-collapsed"><span
@@ -201,10 +201,15 @@
                     <div class="panel">
                         <div class="panel-header panel-controls">
                         </div>
-                        <div class="panel-content">
+                        <div id="mainPanel" class="panel-content">
                             <div class="m-b-20">
+
                                 <div id="addNewDiv">
 
+
+                                </div>
+
+                                <div id="searchparams">
 
                                 </div>
                             </div>

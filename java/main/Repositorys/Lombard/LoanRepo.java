@@ -19,9 +19,15 @@ import java.util.List;
 public interface LoanRepo extends JpaRepository<Loan,Long> {
 
 
+    @Query(value = "select l from Loan l join l.filial f where f=:filial " +
+            "and l.closed=:closed and l.isActive=true order by l.createDate desc")
+    Page<Loan> findMyFilialLoans(@Param("filial") Filial filial,@Param("closed") boolean closed, Pageable pageable);
+
     @Query(value = "select l from Loan l join l.filial f join l.client c where f=:filial " +
-            "and ( l.number  LIKE CONCAT('%',:search,'%') or c.personalNumber LIKE CONCAT('%',:search,'%')) order by l.createDate desc")
-    Page<Loan> findMyFilialLoans(@Param("search")String search,@Param("filial") Filial filial, Pageable pageable);
+            "and l.isActive=true and l.closed=:closed and ( l.number  LIKE CONCAT('%',:search,'%') or c.personalNumber LIKE CONCAT('%',:search,'%')) order by l.createDate desc")
+    Page<Loan> findMyFilialLoansWithSearch(@Param("search") String search,
+                                           @Param("filial") Filial filial,@Param("closed") boolean closed, Pageable pageable);
+
 
     @Query(value = "select l from Loan l join l.client c where c.id=:id order by l.createDate desc")
     List<Loan> findClientLoans(@Param("id")long id);

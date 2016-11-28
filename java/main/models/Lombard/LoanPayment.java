@@ -1,6 +1,7 @@
 package main.models.Lombard;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import main.models.Lombard.TypeEnums.LoanPaymentType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,7 +10,12 @@ import java.util.Date;
  * Created by kaxa on 11/23/16.
  */
 @Entity
-@Table(name = "LoanPayment")
+@Table(name = "LoanPayment",indexes = {
+        @Index(name = "loanIdIndex",columnList = "loanId",unique = false),
+        @Index(name = "activeIndex",columnList = "active",unique = false),
+        @Index(name = "dateIndex",columnList = "createDate",unique = false)
+
+})
 public class LoanPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,6 +57,10 @@ public class LoanPayment {
         this.createDate=new Date();
         this.usedFully=false;
         this.usedSum=0f;
+        if(type== LoanPaymentType.PARTIAL.getCODE()){
+            this.usedFully=true;
+            this.usedSum=sum;
+        }
     }
     public LoanPayment(){}
 

@@ -311,6 +311,7 @@ $(document).ready(function () {
         $("#loadClientsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
+            $("#searchparams").html("");
             loadClientsData(0, "");
             currentFunction = loadClientsData;
         });
@@ -318,6 +319,15 @@ $(document).ready(function () {
         $("#loadLoansButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
+            $("#searchparams").html("");
+            $("#searchparams").append('<div class="input-group">  ' +
+                '<div class="icheck-list">      ' +
+                '<label><input id="closedParam" type="checkbox" data-checkbox="icheckbox_square-blue">დახურული</label>');
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_minimal',
+                radioClass: 'iradio_minimal',
+                increaseArea: '20%' // optional
+            })
             loadLoansData(0, "");
             currentFunction = loadLoansData;
 
@@ -325,14 +335,15 @@ $(document).ready(function () {
         $("#loadConditionsButton").click(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
+            $("#searchparams").html("");
             loadLoanConditions();
             currentFunction = loadLoanConditions;
 
         });
 
 
-        currentFunction = loadLoansData;
-        loadLoansData(0, "");
+        currentFunction = loadClientsData;
+        loadClientsData(0, "");
     }
     //loadProductsData(0, "");
 });

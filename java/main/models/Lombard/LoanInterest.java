@@ -9,7 +9,12 @@ import java.util.Date;
  * Created by kaxa on 11/24/16.
  */
 @Entity
-@Table(name = "LoanInterests")
+@Table(name = "LoanInterests",indexes = {
+        @Index(name = "loanIdIndex",columnList = "loanId",unique = false),
+        @Index(name = "activeIndex",columnList = "active",unique = false),
+        @Index(name = "dateIndex",columnList = "createDate",unique = false)
+
+})
 public class LoanInterest {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
