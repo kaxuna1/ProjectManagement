@@ -25,13 +25,24 @@ public class ScheduledTasks {
     @Scheduled(cron = "* * * * * *")
     public void calculatePercentsForLoans() {
 
+        Calendar cal = Calendar.getInstance(); // locale-specific
+        cal.setTime(new Date());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long time = cal.getTimeInMillis();
+        log.info(cal.getTime().toString());
 
-        Calendar calendar = new Calendar.Builder().build();
-        calendar.setTime(new Date());
-        log.info(calendar.getTime().toString());
 
-
-        List<Loan> loanList=loanRepo.findByNextInterestCalculationDateAndIsActiveAndClosed(new Date(),true,false);
+        List<Loan> loanList=
+                loanRepo.
+                        findByIsActiveAndClosedAndNextInterestCalculationDateBetween(true,
+                                false,
+                                cal.getTime(),
+                                new DateTime(cal.getTime().getTime()).plusDays(1).toDate());
+        loanList.forEach(Loan::addInterest);
+        loanRepo.save(loanList);
     }
 
     @Autowired

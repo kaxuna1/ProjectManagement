@@ -35,6 +35,5 @@ public interface LoanRepo extends JpaRepository<Loan,Long> {
     @Query(value = "select l from Loan l join l.client c where c.id=:id order by l.createDate desc")
     List<Loan> findClientLoans(@Param("id")long id);
 
-    List<Loan> findByNextInterestCalculationDateAndIsActiveAndClosed(@Temporal(TemporalType.DATE)Date nextInterestCalculationDate,
-                                                                     boolean active, boolean closed);
+    List<Loan> findByIsActiveAndClosedAndNextInterestCalculationDateBetween(boolean active, boolean closed,Date nextInterestCalculationDateStart,Date nextInterestCalculationDateEnd);
 }
