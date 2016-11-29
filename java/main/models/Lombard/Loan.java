@@ -5,12 +5,15 @@ import main.models.DictionaryModels.Filial;
 import main.models.Lombard.Dictionary.LoanCondition;
 import main.models.Lombard.ItemClasses.Laptop;
 import main.models.Lombard.ItemClasses.MobilePhone;
+import main.models.Lombard.ItemClasses.Uzrunvelyofa;
 import main.models.Lombard.MovementModels.LoanMovement;
 import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
 import main.models.Lombard.TypeEnums.LoanPaymentType;
+import main.models.Lombard.TypeEnums.LoanStatusTypes;
 import main.models.Lombard.TypeEnums.MovementTypes;
 import main.models.UserManagement.User;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscription;
@@ -18,9 +21,10 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by kaxa on 11/16/16.
@@ -44,13 +48,11 @@ public class Loan {
     @JsonIgnore
     private Client client;
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<MobilePhone> mobilePhones;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Laptop> laptops;
+    private List<Uzrunvelyofa> uzrunvelyofas;
+
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -100,6 +102,9 @@ public class Loan {
     @Column
     private Date closeDate;
 
+    @Column
+    private int status;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -111,7 +116,6 @@ public class Loan {
         this.client = client;
         this.filial = filial;
         this.loanSum = loanSum;
-        this.mobilePhones = new ArrayList<>();
         this.isActive = true;
         this.createDate = new Date();
         this.lastModifyDate = new Date();
@@ -119,8 +123,8 @@ public class Loan {
         this.movements = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.onFirstInterest = true;
-        this.laptops = new ArrayList<>();
         this.closed = false;
+        this.uzrunvelyofas=new ArrayList<>();
     }
 
     public Loan() {
@@ -140,14 +144,6 @@ public class Loan {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public List<MobilePhone> getMobilePhones() {
-        return mobilePhones;
-    }
-
-    public void setMobilePhones(List<MobilePhone> mobilePhones) {
-        this.mobilePhones = mobilePhones;
     }
 
     public String getNumber() {
@@ -375,13 +371,6 @@ public class Loan {
         this.onFirstInterest = onFirstInterest;
     }
 
-    public List<Laptop> getLaptops() {
-        return laptops;
-    }
-
-    public void setLaptops(List<Laptop> laptops) {
-        this.laptops = laptops;
-    }
 
     public String getClientFullName() {
         return this.client.getName() + " " + this.client.getSurname();
@@ -453,9 +442,11 @@ public class Loan {
 
     private void tryClosingLoan() {
         if (this.getSumForLoanClose() <= 0 && !this.isClosed()) {
-            LoanMovement loanMovement = new LoanMovement("სესხი დაიხურა", MovementTypes.LOAN_CLOSED.getCODE(), this);
+            LoanMovement loanMovement = new LoanMovement("სესხი დაიხურა წარმატებით.", MovementTypes.LOAN_CLOSED.getCODE(), this);
             this.movements.add(loanMovement);
             this.closed = true;
+            //this.uzrunvelyofas.forEach(Uzrunvelyofa::free);
+            this.status= LoanStatusTypes.CLOSED_WITH_SUCCESS.getCODE();
             this.closeDate = new Date();
         }
     }
@@ -487,5 +478,54 @@ public class Loan {
 
     public void setCloseDate(Date closeDate) {
         this.closeDate = closeDate;
+    }
+
+    public boolean isOverdue() {
+        DateTime dateTime = new DateTime();
+        DateTime dateTime1 = new DateTime();
+        final boolean[] overdue = {false};
+        dateTime.toLocalDateTime().toLocalDate().isAfter(dateTime1.toLocalDateTime().toLocalDate());
+        if (this.closed)
+            return false;
+        Observable.from(loanInterests).filter(loanInterest -> !loanInterest.isPayed() && (new DateTime().toLocalDateTime().toLocalDate().
+                isAfter(new DateTime(loanInterest.getDueDate().getTime()).toLocalDateTime().toLocalDate()))).subscribe(loanInterest -> {
+            overdue[0] = true;
+        });
+
+        return overdue[0];
+    }
+
+    public Date getNextPaymentDate() {
+        Optional<LoanInterest> loanInterestOptional=loanInterests.stream().filter(loanInterest -> !loanInterest.isPayed())
+                .min(Comparator.comparing(LoanInterest::getDueDate));
+        if(loanInterestOptional.isPresent()){
+            return loanInterestOptional.get().getDueDate();
+        }
+        return null;
+    }
+
+    public void confiscateAndCloseLoan(){
+        LoanMovement loanMovement = new LoanMovement("სესხი დაიხურა ნივთების კონფიკაციით.", MovementTypes.LOAN_CLOSED.getCODE(), this);
+        this.movements.add(loanMovement);
+        this.closed = true;
+        uzrunvelyofas.forEach(Uzrunvelyofa::confiscate);
+        this.status= LoanStatusTypes.CLOSED_WITH_CONFISCATION.getCODE();
+        this.closeDate = new Date();
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public List<Uzrunvelyofa> getUzrunvelyofas() {
+        return uzrunvelyofas;
+    }
+
+    public void setUzrunvelyofas(List<Uzrunvelyofa> uzrunvelyofas) {
+        this.uzrunvelyofas = uzrunvelyofas;
     }
 }

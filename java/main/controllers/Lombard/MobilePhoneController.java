@@ -1,16 +1,15 @@
 package main.controllers.Lombard;
 
-import main.Repositorys.Lombard.LoanRepo;
-import main.Repositorys.Lombard.MobileBrandRepo;
-import main.Repositorys.Lombard.MobileModelRepo;
-import main.Repositorys.Lombard.MobilePhoneRepo;
+import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
 import main.models.Enum.JsonReturnCodes;
 import main.models.Enum.UserType;
 import main.models.JsonMessage;
+import main.models.Lombard.Dictionary.Brand;
 import main.models.Lombard.Dictionary.MobileBrand;
 import main.models.Lombard.ItemClasses.Laptop;
 import main.models.Lombard.ItemClasses.MobilePhone;
+import main.models.Lombard.ItemClasses.Uzrunvelyofa;
 import main.models.Lombard.Loan;
 import main.models.Lombard.ReturnedCombinedModels.ReturnCombinedModel;
 import main.models.UserManagement.Session;
@@ -19,10 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +38,8 @@ public class MobilePhoneController {
     private MobilePhoneRepo mobilePhoneRepo;
     @Autowired
     private MobileBrandRepo mobileBrandRepo;
+    @Autowired
+    private BrandRepo  brandRepo;
     @ResponseBody
     @RequestMapping("/createMobilePhone")
     public JsonMessage create(@CookieValue("projectSessionId") long sessionId,
@@ -74,22 +72,28 @@ public class MobilePhoneController {
     }
     @RequestMapping("/getLoanPhones")
     @ResponseBody
-    public ReturnCombinedModel getLoanPhones(@CookieValue("projectSessionId") long sessionId,
-                                             @RequestParam(value = "loan", required = true, defaultValue = "0") long loan){
+    public List<Uzrunvelyofa> getLoanPhones(@CookieValue("projectSessionId") long sessionId,
+                                            @RequestParam(value = "loan", required = true, defaultValue = "0") long loan){
         Session session = sessionRepository.findOne(sessionId);
         Loan loanObj = loanRepo.findOne(loan);
-        ReturnCombinedModel returnCombinedModel=new ReturnCombinedModel(loanObj.getMobilePhones(),loanObj.getLaptops());
-        return returnCombinedModel;
+        return loanObj.getUzrunvelyofas();
     }
-    @RequestMapping("/getFilialPhones")
+    @RequestMapping("/getbrands/{type}")
     @ResponseBody
-    public Page<MobilePhone> getMyFilialPhones(@CookieValue("projectSessionId") long sessionId, int index){
-        Session session = sessionRepository.findOne(sessionId);
-
-        return mobilePhoneRepo.findForMyFilialByIndex(session.getUser().getFilial(),constructPageSpecification(index));
+    public List<Brand> getBrands(@CookieValue("projectSessionId") long sessionId,
+                                 @PathVariable("type")int type){
+        return brandRepo.findByTypeOrType(type,3);
     }
     private Pageable constructPageSpecification(int pageIndex) {
         Pageable pageSpecification = new PageRequest(pageIndex, 1);
         return pageSpecification;
+    }
+
+    public BrandRepo getBrandRepo() {
+        return brandRepo;
+    }
+
+    public void setBrandRepo(BrandRepo brandRepo) {
+        this.brandRepo = brandRepo;
     }
 }

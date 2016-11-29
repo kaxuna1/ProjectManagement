@@ -1,12 +1,9 @@
 /**
  * Created by kaxa on 11/19/16.
  */
-
-/**
- * Created by kakha on 11/12/2015.
- */
 var openUserGlobal;
 function loadClientsData(index, search) {
+    $("#mainPanel").slideUp("fast",function () {
     $.getJSON("/getClients?index=" + index + "&search=" + search, function (result) {
         $("#dataGridHeader").html("");
         $("#dataGridBody").html("");
@@ -32,6 +29,7 @@ function loadClientsData(index, search) {
             );
 
         }
+        $("#mainPanel").slideDown("slow");
         for (i = 0; i < totalPages; i++) {
             $("#paginationUl").append('<li value="' + i + '" class="paginate_button ' + (index == i ? 'active"' : '') + '"><a href="#">' + (i + 1) + '</a></li>');
         }
@@ -107,27 +105,33 @@ function loadClientsData(index, search) {
         })
 
 
-    });
+    });});
 
 
 }
 openUserGlobal=function (currentElement) {
     showModalWithTableInside(function (head, body, modal) {
-        body.html("")
+        body.html("");
+        head.html("");
         $.getJSON("getClientloans/"+currentElement.id,function (result) {
+            head.html("<strong style='font-family: font1'>კლიენტი: "+currentElement.name+
+                " "+
+                currentElement.surname+
+                " // გაცემულია "+result.length+" სესხი</strong>")
             body.html(loansForClientGridTemplate)
             var clientLoansContainerDiv=$("#clientLoansContainerDiv");
             for(key in result){
                 var item= result[key];
-                var statusString = '<span class="label label-danger"> სტატუსი' + /*item.imei + */'</span>' +
-                    '<span class="label label-danger">' + item.loanSum + ' ლარი</span>' +
-                    (item.closed?'<span class="label label-danger">დახურული</span>':"");
+                var statusString = '<span style="font-family: font1" class="label label-default"><i class="fa fa-money" aria-hidden="true"></i>' + item.loanSum + ' ლარი</span>' +
+                    '<span style="font-family: font1" class="label label-default">გაიცა: ' + moment(new Date(item.createDate)).locale("ka").format("L") + '</span>' +
+                    (item.closed?'<span style="font-family: font1" class="label label-blue">დახურული</span>':"")+
+                    (item.overdue?'<span style="font-family: font1" class="label label-danger">დაგვიანება</span>':"");
                 clientLoansContainerDiv.append('<div value="' + key + '" class="client-loan stage-item message-item media">' +
                     '<div class="media">' +
                     '<img src="assets/images/avatars/avatar11_big.png" alt="avatar 3" width="40" class="sender-img">' +
                     '   <div class="media-body">' +
-                    '   <div class="sender">' + item.number+ '</div>' +
-                    '<div style="width: 40%;" class="subject">' + statusString + '</div>' +
+                    '   <div style="width: 20%" class="sender">' + item.number+ '</div>' +
+                    '<div style="width: 70%;" class="subject">' + statusString + '</div>' +
                     '</div>' +
                     '</div>' +
                     '</div>')

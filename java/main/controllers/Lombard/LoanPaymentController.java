@@ -1,9 +1,6 @@
 package main.controllers.Lombard;
 
-import main.Repositorys.Lombard.ClientsRepo;
-import main.Repositorys.Lombard.LoanMovementsRepo;
-import main.Repositorys.Lombard.LoanPaymentRepo;
-import main.Repositorys.Lombard.LoanRepo;
+import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
 import main.models.Enum.JsonReturnCodes;
 import main.models.Enum.UserType;
@@ -44,7 +41,8 @@ public class LoanPaymentController {
     private ClientsRepo clientsRepo;
     @Autowired
     private LoanMovementsRepo loanMovementsRepo;
-
+    @Autowired
+    private UzrunvelyofaRepo uzrunvelyofaRepo;
 
 
     @RequestMapping("/makePayment")
@@ -61,21 +59,23 @@ public class LoanPaymentController {
 
                 if(paymentType==LoanPaymentType.FULL.getCODE()){
                     loan.makePaymentForClosing(sum);
-                    loanRepo.save(loan);
+                    loan=loanRepo.save(loan);
+                    loan.getUzrunvelyofas().forEach(uzrunvelyofa -> {
+                        uzrunvelyofa.free();
+                        uzrunvelyofaRepo.save(uzrunvelyofa);
+                    });
                 }else{
                     loan.makePayment(sum,paymentType);
                     loanRepo.save(loan);
                 }
                 return new JsonMessage(JsonReturnCodes.Ok.getCODE(),"ok");
             }catch (Exception e){
+                e.printStackTrace();
                 return new JsonMessage(JsonReturnCodes.ERROR.getCODE(),"error");
             }
         }else{
             return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),"არ გაქვთ ამ მოქმედების უფლება");
         }
-
-
-
     }
 
     @RequestMapping("/filialpayments/{page}")

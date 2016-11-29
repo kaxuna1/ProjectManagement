@@ -44,11 +44,6 @@ public class Laptop {
     @Column
     private float sum;
 
-    @ManyToOne
-    @JoinColumn(name = "loanId")
-    @JsonIgnore
-    private Loan loan;
-
     @Column
     private boolean active;
 
@@ -56,7 +51,6 @@ public class Laptop {
         this.laptopBrand = laptopBrand;
         this.model = model;
         this.active=true;
-        this.loan=loan;
     }
     public Laptop(){}
 
@@ -125,13 +119,6 @@ public class Laptop {
         this.active = active;
     }
 
-    public Loan getLoan() {
-        return loan;
-    }
-
-    public void setLoan(Loan loan) {
-        this.loan = loan;
-    }
 
     public String getNumber() {
         return number;
@@ -159,5 +146,9 @@ public class Laptop {
 
     public String getBrandName(){
         return this.laptopBrand.getName();
+    }
+
+    public void confiscate() {
+
     }
 }

@@ -1,11 +1,10 @@
 package main.controllers.Lombard;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.jmnarloch.spring.boot.rxjava.async.ObservableSseEmitter;
+import com.google.zxing.MultiFormatWriter;
 import main.Repositorys.Lombard.*;
 import main.Repositorys.SessionRepository;
 import main.Services.Service1;
@@ -13,43 +12,28 @@ import main.StaticData;
 import main.models.Enum.JsonReturnCodes;
 import main.models.Enum.UserType;
 import main.models.JsonMessage;
-import main.models.LoanCreateModel;
-import main.models.Lombard.Client;
-import main.models.Lombard.Dictionary.MobileBrand;
-import main.models.Lombard.ItemClasses.Laptop;
-import main.models.Lombard.ItemClasses.MobilePhone;
+import main.models.Lombard.ItemClasses.Uzrunvelyofa;
 import main.models.Lombard.Loan;
 import main.models.Lombard.LoanInterest;
 import main.models.Lombard.MovementModels.LoanMovement;
-import main.models.Lombard.TypeEnums.LoanConditionPeryodType;
 import main.models.Lombard.TypeEnums.MovementTypes;
-import main.models.RequestJsonModel;
+import main.models.Lombard.TypeEnums.UzrunvelyofaStatusTypes;
+import main.models.Lombard.TypeEnums.UzrunvelyofaTypes;
 import main.models.UserManagement.Session;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import rx.Observable;
-import rx.Subscriber;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.transaction.UserTransaction;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Created by kaxa on 11/19/16.
@@ -78,6 +62,10 @@ public class LoanController {
     private LaptopBrandRepo laptopBrandRepo;
     @Autowired
     private LaptopRepo laptopRepo;
+    @Autowired
+    private BrandRepo brandRepo;
+    @Autowired
+    private UzrunvelyofaRepo uzrunvelyofaRepo;
 
     @RequestMapping("/send")
     @ResponseBody
@@ -118,6 +106,22 @@ public class LoanController {
     }
 
 
+    @RequestMapping("loanbarcode/{id}")
+    @ResponseBody
+    public byte[] getLoanBarcode(@CookieValue("projectSessionId") long sessionId, @PathVariable("id") long id){
+        Loan loan=loanRepo.findOne(id);
+        MultiFormatWriter writer=new MultiFormatWriter();
+        String data=loan.getNumber();
+/*
+        try {
+            BitMatrix bm=writer.encode(data, BarcodeFormat.CODE_128,180,40);
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }*/
+        return null;
+
+    }
 
     @RequestMapping("/getloan/{id}")
     @ResponseBody
@@ -157,8 +161,7 @@ public class LoanController {
         if (session.isIsactive() & session.getUser().getType() == UserType.lombardOperator.getCODE()) {
 
             try {
-                List<MobilePhone> mobilePhones = new ArrayList<>();
-                List<Laptop> laptops = new ArrayList<>();
+                List<Uzrunvelyofa> uzrunvelyofas=new ArrayList<>();
                 float loanSum = 0;
 
 
@@ -180,33 +183,37 @@ public class LoanController {
 
                 for (int i = 0; i < mobiles.size(); i++) {
                     JsonObject mobile = mobiles.get(i).getAsJsonObject();
-                    MobilePhone mobilePhoneTemp = new MobilePhone();
+                    Uzrunvelyofa mobilePhoneTemp = new Uzrunvelyofa();
+                    mobilePhoneTemp.setUzrunvelyofaMovements(new ArrayList<>());
                     mobilePhoneTemp.setSum(mobile.get("sum").getAsFloat());
                     mobilePhoneTemp.setActive(true);
                     mobilePhoneTemp.setComment(mobile.get("comment").getAsString());
                     mobilePhoneTemp.setIMEI(mobile.get("imei").getAsString());
                     mobilePhoneTemp.setLoan(null);
-                    mobilePhoneTemp.setModelName(mobile.get("model").getAsString());
-                    mobilePhoneTemp.setMobileBrand(mobileBrandRepo.findOne(mobile.get("brand").getAsLong()));
-                    mobilePhoneTemp.setNumber("1234321");
-                    mobilePhones.add(mobilePhoneTemp);
+                    mobilePhoneTemp.setType(UzrunvelyofaTypes.MOBILE.getCODE());
+                    mobilePhoneTemp.setModel(mobile.get("model").getAsString());
+                    mobilePhoneTemp.setBrand(brandRepo.findOne(mobile.get("brand").getAsLong()));
+                    mobilePhoneTemp.setStatus(UzrunvelyofaStatusTypes.DATVIRTULI.getCODE());
+                    uzrunvelyofas.add(mobilePhoneTemp);
                     loanSum += mobile.get("sum").getAsFloat();
                 }
                 for (int i = 0; i < laptopsJson.size(); i++) {
                     JsonObject laptop = laptopsJson.get(i).getAsJsonObject();
-                    Laptop laptopTemp=new Laptop();
+                    Uzrunvelyofa laptopTemp=new Uzrunvelyofa();
+                    laptopTemp.setUzrunvelyofaMovements(new ArrayList<>());
                     laptopTemp.setActive(true);
-                    laptopTemp.setLaptopBrand(laptopBrandRepo.findOne(laptop.get("brand").getAsLong()));
+                    laptopTemp.setBrand(brandRepo.findOne(laptop.get("brand").getAsLong()));
                     laptopTemp.setModel(laptop.get("model").getAsString());
                     laptopTemp.setCpu(laptop.get("cpu").getAsString());
                     laptopTemp.setGpu(laptop.get("gpu").getAsString());
                     laptopTemp.setRam(laptop.get("ram").getAsString());
                     laptopTemp.setHdd(laptop.get("hdd").getAsString());
-                    laptopTemp.setNumber("12344321");
+                    laptopTemp.setType(UzrunvelyofaTypes.LAPTOP.getCODE());
+                    laptopTemp.setStatus(UzrunvelyofaStatusTypes.DATVIRTULI.getCODE());
                     laptopTemp.setSum(laptop.get("sum").getAsFloat());
                     laptopTemp.setComment(laptop.get("comment").getAsString());
                     loanSum+=laptop.get("sum").getAsFloat();
-                    laptops.add(laptopTemp);
+                    uzrunvelyofas.add(laptopTemp);
                 }
 
 
@@ -218,17 +225,11 @@ public class LoanController {
                 long id=loan.getId();
                 int year=new DateTime().getYear()-2000;
                 loan.setNumber("LN"+StaticData.hashids.encode(id)+year);
-
-
                 final Loan finalLoan = loan;
-                mobilePhones.forEach(mobilePhone -> mobilePhone.setLoan(finalLoan));
-                laptops.forEach(laptop -> laptop.setLoan(finalLoan));
-                mobilePhones=mobilePhoneRepo.save(mobilePhones);
-                laptops=laptopRepo.save(laptops);
-                mobilePhones.forEach(mobilePhone -> mobilePhone.setNumber("MB"+StaticData.hashids.encode(mobilePhone.getId()+year)));
-                laptops.forEach(laptop -> laptop.setNumber("LP"+StaticData.hashids.encode(laptop.getId()+year)));
-                mobilePhones=mobilePhoneRepo.save(mobilePhones);
-                laptops=laptopRepo.save(laptops);
+                uzrunvelyofas.forEach(uzrunvelyofa -> uzrunvelyofa.setLoan(finalLoan));
+                uzrunvelyofas=uzrunvelyofaRepo.save(uzrunvelyofas);
+                uzrunvelyofas.forEach(uzrunvelyofa -> uzrunvelyofa.setNumber("LP"+StaticData.hashids.encode(uzrunvelyofa.getId()+year)));
+                uzrunvelyofas=uzrunvelyofaRepo.save(uzrunvelyofas);
                 LoanMovement loanMovement = new LoanMovement("სესხი დარეგისტრირდა", MovementTypes.REGISTERED.getCODE(), loan);
                 loanMovementsRepo.save(loanMovement);
                 loan.addFirstInterest();
@@ -284,6 +285,36 @@ public class LoanController {
         loanRepo.save(loan);
         return new JsonMessage(JsonReturnCodes.Ok.getCODE(), "ok");
     }
+
+    @RequestMapping("/closewithconfiscation/{id}")
+    @ResponseBody
+    public JsonMessage closeLoanWithConfiscation(@CookieValue("projectSessionId") long sessionId,
+                                                 @PathVariable("id") long id){
+        Session session = sessionRepository.findOne(sessionId);
+        Loan loan=loanRepo.findOne(id);
+        if(session.isIsactive()&&
+                loan.getFilial().getId()==session.getUser().getFilial().getId()&&
+                loan.isOverdue()){
+            try{
+
+                loan.confiscateAndCloseLoan();
+                loanRepo.save(loan);
+            }catch (Exception e){
+                e.printStackTrace();
+                new JsonMessage(JsonReturnCodes.ERROR.getCODE(),
+                        "მოხდა შეცდომა ოპერაციის შესრულებისას");
+            }
+
+
+            new JsonMessage(JsonReturnCodes.Ok.getCODE(),
+                    "წარმატებით შესრულდა ოპერაცია");
+
+        }
+        return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),
+                "არგაქვთ ამ მოქმედების უფლება");
+    }
+
+
 
     private Pageable constructPageSpecification(int pageIndex) {
         Pageable pageSpecification = new PageRequest(pageIndex, 30);

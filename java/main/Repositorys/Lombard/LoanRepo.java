@@ -6,9 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TemporalType;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,4 +34,7 @@ public interface LoanRepo extends JpaRepository<Loan,Long> {
 
     @Query(value = "select l from Loan l join l.client c where c.id=:id order by l.createDate desc")
     List<Loan> findClientLoans(@Param("id")long id);
+
+    List<Loan> findByNextInterestCalculationDateAndIsActiveAndClosed(@Temporal(TemporalType.DATE)Date nextInterestCalculationDate,
+                                                                     boolean active, boolean closed);
 }

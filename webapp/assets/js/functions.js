@@ -303,9 +303,12 @@ $(document).ready(function () {
             '<a href="#">' +
             '<i class="fa fa-balance-scale" aria-hidden="true"></i> ' +
             '<span style="font-family: font1;" data-translate="სესხები">სესხები</span></a></li>');
+        navigation.append('<li id="loadConfiscatedButton" class="k">' +
+            '<a href="#"><i class="fa fa-mobile" aria-hidden="true"></i>' +
+            '<span style="font-family: font1;" data-translate=" დაკავებული ნივთები"> დაკავებული ნივთები</span></a></li>');
         navigation.append('<li id="loadConditionsButton" class="k">' +
             '<a href="#"><i class="fa fa-percent" aria-hidden="true"></i>' +
-            '<span style="font-family: font1;" data-translate="% განაკვეთები"> განაკვეთები</span></a></li>');
+            '<span style="font-family: font1;" data-translate=" განაკვეთები"> განაკვეთები</span></a></li>');
 
 
         $("#loadClientsButton").click(function () {
@@ -314,6 +317,14 @@ $(document).ready(function () {
             $("#searchparams").html("");
             loadClientsData(0, "");
             currentFunction = loadClientsData;
+        });
+        
+        $("#loadConfiscatedButton").click(function () {
+            $(".k").attr("class", "k");
+            $(this).attr("class", "k nav-active active");
+            $("#searchparams").html("");
+            loadConfiscatedData(0, "");
+            currentFunction = loadConfiscatedData;
         });
 
         $("#loadLoansButton").click(function () {

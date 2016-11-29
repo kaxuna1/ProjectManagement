@@ -19,8 +19,4 @@ import java.util.List;
 @Transactional
 public interface MobilePhoneRepo extends JpaRepository<MobilePhone,Long> {
 
-
-
-    @Query(value = "select u from MobilePhone u join u.loan l join l.filial f where f=:filial")
-    Page<MobilePhone> findForMyFilialByIndex(@Param("filial") Filial filial, Pageable pageable);
 }

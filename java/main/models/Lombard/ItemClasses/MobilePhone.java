@@ -30,11 +30,6 @@ public class MobilePhone {
     @Column
     private String modelName;
 
-    @ManyToOne
-    @JoinColumn(name = "loanId")
-    @JsonIgnore
-    private Loan loan;
-
     @Column
     private String number;
 
@@ -51,7 +46,6 @@ public class MobilePhone {
     public MobilePhone(String imei, MobileBrand mobileBrand, Loan loan, String comment,String modelName,float sum) {
         IMEI = imei;
         this.mobileBrand = mobileBrand;
-        this.loan = loan;
         this.comment = comment;
         this.isActive=true;
         this.number="";
@@ -91,14 +85,6 @@ public class MobilePhone {
         isActive = active;
     }
 
-    public Loan getLoan() {
-        return loan;
-    }
-
-    public void setLoan(Loan loan) {
-        this.loan = loan;
-    }
-
     public String getNumber() {
         return number;
     }
@@ -134,7 +120,8 @@ public class MobilePhone {
     public String getBrandName(){
         return this.mobileBrand.getName();
     }
-    public String getLoanNumber(){
-        return this.loan.getNumber();
+
+    public void confiscate() {
+
     }
 }
