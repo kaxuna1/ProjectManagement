@@ -28,6 +28,9 @@ public class Uzrunvelyofa {
     private String model;
 
     @Column
+    private String name;
+
+    @Column
     private String cpu;
 
     @Column
@@ -212,5 +215,13 @@ public class Uzrunvelyofa {
         this.setStatus(UzrunvelyofaStatusTypes.GATAVISUFLEBULI.getCODE());
         this.uzrunvelyofaMovements.add(new UzrunvelyofaMovement("გათავისუფლდა სესხისგან",
                 UzrunvelyofaStatusTypes.GATAVISUFLEBULI.getCODE(),this));
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -40,6 +40,8 @@ public class MobilePhoneController {
     private MobileBrandRepo mobileBrandRepo;
     @Autowired
     private BrandRepo  brandRepo;
+    @Autowired
+    private UzrunvelyofaRepo uzrunvelyofaRepo;
     @ResponseBody
     @RequestMapping("/createMobilePhone")
     public JsonMessage create(@CookieValue("projectSessionId") long sessionId,
@@ -85,15 +87,16 @@ public class MobilePhoneController {
         return brandRepo.findByTypeOrType(type,3);
     }
     private Pageable constructPageSpecification(int pageIndex) {
-        Pageable pageSpecification = new PageRequest(pageIndex, 1);
+        Pageable pageSpecification = new PageRequest(pageIndex, 30);
         return pageSpecification;
     }
-
-    public BrandRepo getBrandRepo() {
-        return brandRepo;
+    @RequestMapping("/getdakavebulinivtebi")
+    @ResponseBody
+    public Page<Uzrunvelyofa> getConfiscated(@CookieValue("projectSessionId") long sessionId,
+                                             @RequestParam(value = "index", required = true, defaultValue = "0") int index,
+                                             @RequestParam(value = "search", required = true, defaultValue = "") String search){
+        return uzrunvelyofaRepo.findForFilial(search,4,sessionRepository.findOne(sessionId).getUser().getFilial(),constructPageSpecification(index));
     }
 
-    public void setBrandRepo(BrandRepo brandRepo) {
-        this.brandRepo = brandRepo;
-    }
+
 }

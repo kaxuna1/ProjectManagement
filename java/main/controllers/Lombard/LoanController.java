@@ -296,22 +296,24 @@ public class LoanController {
                 loan.getFilial().getId()==session.getUser().getFilial().getId()&&
                 loan.isOverdue()){
             try{
-
                 loan.confiscateAndCloseLoan();
                 loanRepo.save(loan);
+
+                return new JsonMessage(JsonReturnCodes.Ok.getCODE(),
+                        "წარმატებით შესრულდა ოპერაცია");
             }catch (Exception e){
                 e.printStackTrace();
-                new JsonMessage(JsonReturnCodes.ERROR.getCODE(),
+                return new JsonMessage(JsonReturnCodes.ERROR.getCODE(),
                         "მოხდა შეცდომა ოპერაციის შესრულებისას");
             }
 
 
-            new JsonMessage(JsonReturnCodes.Ok.getCODE(),
-                    "წარმატებით შესრულდა ოპერაცია");
 
+        }else{
+            return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),
+                    "არგაქვთ ამ მოქმედების უფლება");
         }
-        return new JsonMessage(JsonReturnCodes.DONTHAVEPERMISSION.getCODE(),
-                "არგაქვთ ამ მოქმედების უფლება");
+
     }
 
 

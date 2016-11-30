@@ -311,6 +311,7 @@ public class Loan {
     }
 
     public void addInterest() {
+
         DateTime dateTime = new DateTime();
         if (loanCondition.getPeriodType() == LoanConditionPeryodType.DAY.getCODE())
             this.nextInterestCalculationDate = dateTime.plusDays(loanCondition.getPeriod()).toDate();
@@ -320,6 +321,8 @@ public class Loan {
             this.nextInterestCalculationDate = dateTime.plusMonths(loanCondition.getPeriod()).toDate();
         if (this.onFirstInterest)
             this.nextInterestCalculationDate = new DateTime(this.nextInterestCalculationDate).minusDays(1).toDate();
+
+        if(this.loanCondition.PercentLogical(this.isOnFirstInterest())>0)
         this.loanInterests.add(
                 new LoanInterest(this,
                         ((getLeftSum() / 100) * this.loanCondition.PercentLogical(this.isOnFirstInterest())),

@@ -347,7 +347,7 @@ $(document).ready(function () {
             $(".k").attr("class", "k");
             $(this).attr("class", "k nav-active active");
             $("#searchparams").html("");
-            loadLoanConditions();
+            loadLoanConditions(0,"");
             currentFunction = loadLoanConditions;
 
         });

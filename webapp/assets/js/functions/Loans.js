@@ -679,15 +679,15 @@ function loadLoanDoActions(DOMElements) {
             });
         });
     if (!DOMElements.currentObj.closed && DOMElements.currentObj.overdue)
-        createButtonWithHandlerr(DOMElements.loanDoActionsDiv, "დატვირთული ნივთების კონფისკაცია", function () {
+        createButtonWithHandlerr(DOMElements.loanDoActionsDiv, "ნივთების დაკავება", function () {
 
                     showModalWithTableInside(function (head, body, modal) {
-                        body.append("<strong style='font-family: font1'>გსურთ გაუკეთოთ კონფისკაცია დატვირთულ ნივთებს," +
+                        body.append("<strong style='font-family: font1'>გსურთ დააკავოთ დატვირთულ ნივთები" +
                             " დარიცხული პროცენტის გადაუხდელობის გამო?</strong>")
                     }, {
-                        "კონფისკაციის შესრულება": function () {
+                        "დაკავება": function () {
                             showModalWithTableInside(function (head, body, modal) {
-                                head.html("<strong style='font-family: font1'>დატვირთული ნივთები რომლების კონფისკაციაც მოხდება</strong>")
+                                head.html("<strong style='font-family: font1'>დატვირთული ნივთები რომლების დაკავებაც მოხდება</strong>")
                                 body.html(uzrunvelyofaGridTemplateConfiscate);
                                 DOMElements.uzrunvelyofaContainerDivForConfiscate = $("#uzrunvelyofaConfiscateContainerDiv");
                                 var data = DOMElements.currentObj.uzrunvelyofa;
@@ -735,17 +735,14 @@ function loadLoanDoActions(DOMElements) {
                             }, {
                                 "კი": function () {
                                     $.ajax({
-                                        url: "confiscateLoanUzrunvelyofa",
-                                        data: {
-                                            loanId: DOMElements.currentObj.id
-                                        }
+                                        url: "closewithconfiscation/"+DOMElements.currentObj.id
                                     }).done(function (result) {
                                         console.log(result);
                                         if (result.code === 0) {
                                             $.getJSON("/getloan/" + DOMElements.currentObj.id, function (result2) {
                                                 loadLoansData(indexG, searchG, true);
                                                 openLoanGlobal(result2);
-                                                alert("გადახდა დაფიქსირდა წარმატებით!");
+                                                alert(result.message);
                                             });
 
                                         }
